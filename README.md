@@ -13,6 +13,16 @@ To install JSON API for BuddyPress follow the installation manual.
 
 For future features refer to the Release Management Plan.
 
+==Installation Manual==
+Requirements for this Plugin are a working WordPress installation with BuddyPress up and running.
+
+Furthermore the plugin JSON API needs to be installed and configured, please refer to its installation manual (http://wordpress.org/extend/plugins/json-api/installation/).
+
+To install JSON API for BuddyPress just follow these steps:
+* upload the folder "json-api-for-buddypress" to your WordPress plugin folder (<url-to-wordpress>/wp-content/plugins)
+* activate the plugin through the 'Plugins' menu in WordPress or by using the link provided by the plugin installer
+* activate the controller through the JSON API menu found in the WordPress admin center (Settings -> JSON API)
+
 ==Release Notes==
 ===0.2===
 * extended functionality for activity

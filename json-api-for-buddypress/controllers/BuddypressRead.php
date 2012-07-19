@@ -11,7 +11,7 @@ class JSON_API_BuddypressRead_Controller{
 	 * @return Array Activities
 	 */
 	public function get_activities() {
-            
+            //TODO: limit
                 /* Possible parameters:
                  * int pages: number of pages to display (default unset)
                  * int offset: number of entries per page (default 10 if pages is set, otherwise unset)
@@ -75,12 +75,44 @@ class JSON_API_BuddypressRead_Controller{
 		return $oReturn;
 	}
         
-        private function error($sModule){
+        public function get_profile(){
+            global $json_api;
             $oReturn = new stdClass();
+            
+            if ( is_null($json_api->query->username || !username_exists($json_api->query->username))){
+                $this->error('profile', 1);
+            }
+            
+            $oUser =  get_user_by('login', $json_api->query->username);
+            
+            if ( !bp_has_profile(array('user_id' => $oUser->data->ID))){
+                $this->error('profile', 2);
+            }
+            
+            while ( bp_profile_groups(array('user_id' => $oUser->data->ID)) ){
+                bp_the_profile_group();
+                if ( bp_profile_group_has_fields() ){
+                    bp_the_profile_group_name();
+                    while ( bp_profile_fields() ){
+                        bp_the_profile_field();
+                        if ( bp_field_has_data() ){
+                            bp_the_profile_field_name();
+                            bp_the_profile_field_value();
+                        }
+                    }
+                }
+            }
+        }
+        
+        private function error($sModule, $iCode){
+            $oReturn = new stdClass();
+            $oReturn->status = "error";
             switch ($sModule){
                 case "activity":
-                    $oReturn->status = "error";
                     $oReturn->msg = __('No Activities found.');
+                    return $oReturn;
+                case "profile":
+                    $oReturn->msg = __('No Profile found.');
                     return $oReturn;
             }
         }
