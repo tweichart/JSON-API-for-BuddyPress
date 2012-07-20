@@ -8,7 +8,7 @@ class JSON_API_BuddypressRead_Controller{
         /**
 	 *Returns an object with all activities
 	 * @global Object $json_api
-	 * @return Array Activities
+	 * @return Object Activities
 	 */
 	public function get_activities() {
             //TODO: limit
@@ -74,37 +74,47 @@ class JSON_API_BuddypressRead_Controller{
 		$oReturn->pages = $i - 1;
 		return $oReturn;
 	}
-        
+        /**
+         *Returns an object with profile information
+         * @global Object $json_api
+         * @return Object Profile Fields
+         */
         public function get_profile(){
+            /* Possible parameters:
+             * String username: the username you want information from (required)
+             */
             global $json_api;
             $oReturn = new stdClass();
             
-            if ( is_null($json_api->query->username || !username_exists($json_api->query->username))){
-                $this->error('profile', 1);
+            if ( is_null($json_api->query->username) || !username_exists($json_api->query->username)){
+                return $this->error('profile', 1);
             }
             
             $oUser =  get_user_by('login', $json_api->query->username);
             
             if ( !bp_has_profile(array('user_id' => $oUser->data->ID))){
-                $this->error('profile', 2);
+                return $this->error('profile', 2);
             }
             
             while ( bp_profile_groups(array('user_id' => $oUser->data->ID)) ){
                 bp_the_profile_group();
                 if ( bp_profile_group_has_fields() ){
-                    bp_the_profile_group_name();
+                    $sGroupName = bp_get_the_profile_group_name();
                     while ( bp_profile_fields() ){
                         bp_the_profile_field();
+                        $sFieldName = bp_get_the_profile_field_name();
                         if ( bp_field_has_data() ){
-                            bp_the_profile_field_name();
-                            bp_the_profile_field_value();
+                            $sFieldValue = bp_get_the_profile_field_value();
                         }
+                        $oReturn->groups->$sGroupName->$sFieldName = $sFieldValue;
                     }
                 }
             }
+            return $oReturn;
         }
         
         private function error($sModule, $iCode){
+            //TODO: Code
             $oReturn = new stdClass();
             $oReturn->status = "error";
             switch ($sModule){
