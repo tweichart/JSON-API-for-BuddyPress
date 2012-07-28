@@ -9,6 +9,8 @@ Author URI: https://github.com/tweichart/JSON-API-for-BuddyPress
 License: GPL2
 */
 
+include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+
 if (!is_plugin_active('buddypress/bp-loader.php')) {
     add_action( 'admin_notices', 'draw_notice_buddypress');
     return;

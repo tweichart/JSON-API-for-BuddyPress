@@ -28,3 +28,8 @@ To install JSON API for BuddyPress just follow these steps:
 
 ===0.2===
 * extended functionality for activity
+
+===0.3===
+* extended functionality for profile
+* new parameter 'limit' for get_activity
+* including error handler function 
