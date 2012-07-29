@@ -10,6 +10,7 @@ License: GPL2
 */
 
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+define ('JSON_API_FOR_BUDDYPRESS_HOME', dirname(__FILE__));
 
 if (!is_plugin_active('buddypress/bp-loader.php')) {
     add_action( 'admin_notices', 'draw_notice_buddypress');

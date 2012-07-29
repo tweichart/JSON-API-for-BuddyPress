@@ -5,11 +5,12 @@
   Controller description: Buddypress controller for reading actions
  */
 
+require_once JSON_API_FOR_BUDDYPRESS_HOME . '/library/functions.class.php';
+
 class JSON_API_BuddypressRead_Controller {
 
         /**
          * Returns an object with all activities
-         * @global Object $json_api
          * @return Object Activities
          */
         public function get_activities () {
@@ -27,29 +28,27 @@ class JSON_API_BuddypressRead_Controller {
                  */
 
                 $oReturn = new stdClass();
-                global $json_api;
+                $this->initVars ( 'activity' );
 
                 if ( !bp_has_activities () )
                         return $this->error ( 'activity' );
-
-                if ( !is_null ( $json_api->query->pages ) ) {
+                if ( $this->pages !== 1 ) {
                         $aParams [ 'max' ] = true;
-                        $aParams [ 'per_page' ] = is_null ( $json_api->query->offset ) ? 10 : $json_api->query->offset;
-                        $iPages = $json_api->query->pages;
+                        $aParams [ 'per_page' ] = $this->offset;
+                        $iPages = $this->pages;
                 }
 
-                $aParams [ 'display_comments' ] = is_null ( $json_api->query->comments ) ? false : $json_api->query->comments;
-                $aParams [ 'sort' ] = is_null ( $json_api->query->sort ) ? 'DESC' : 'ASC';
+                $aParams [ 'display_comments' ] = $this->comments;
+                $aParams [ 'sort' ] = $this->sort;
 
-                $aParams [ 'filter' ] [ 'user_id' ] = is_null ( $json_api->query->userid ) ? false : $json_api->query->userid;
-                $aParams [ 'filter' ] [ 'object' ] = is_null ( $json_api->query->component ) ? false : $json_api->query->component;
-                $aParams [ 'filter' ] [ 'action' ] = is_null ( $json_api->query->type ) ? false : $json_api->query->type;
-                $aParams [ 'filter' ] [ 'primary_id' ] = is_null ( $json_api->query->itemid ) ? false : $json_api->query->itemid;
-                $aParams [ 'filter' ] [ 'secondary_id' ] = is_null ( $json_api->query->secondaryitemid ) ? false : $json_api->query->secondaryitemid;
+                $aParams [ 'filter' ] [ 'user_id' ] = $this->userid;
+                $aParams [ 'filter' ] [ 'object' ] = $this->component;
+                $aParams [ 'filter' ] [ 'action' ] = $this->type;
+                $aParams [ 'filter' ] [ 'primary_id' ] = $this->itemid;
+                $aParams [ 'filter' ] [ 'secondary_id' ] = $this->secondaryitemid;
+                $iLimit = $this->limit;
 
-                $iLimit = is_null ( $json_api->query->limit ) ? 0 : $json_api->query->limit;
-
-                if ( is_null ( $json_api->query->pages ) ) {
+                if ( $this->pages === 1 ) {
                         $aParams [ 'page' ] = 1;
                         if ( $iLimit != 0 )
                                 $aParams[ 'per_page' ] = $iLimit;
@@ -88,21 +87,20 @@ class JSON_API_BuddypressRead_Controller {
 
         /**
          * Returns an object with profile information
-         * @global Object $json_api
          * @return Object Profile Fields
          */
         public function get_profile () {
                 /* Possible parameters:
                  * String username: the username you want information from (required)
                  */
-                global $json_api;
+                $this->initVars ( 'profile' );
                 $oReturn = new stdClass();
 
-                if ( is_null ( $json_api->query->username ) || !username_exists ( $json_api->query->username ) ) {
+                if ( $this->username === false || !username_exists ( $this->username ) ) {
                         return $this->error ( 'profile', 1 );
                 }
 
-                $oUser = get_user_by ( 'login', $json_api->query->username );
+                $oUser = get_user_by ( 'login', $this->username );
 
                 if ( !bp_has_profile ( array ( 'user_id' => $oUser->data->ID ) ) ) {
                         return $this->error ( 'profile', 0 );
@@ -126,30 +124,35 @@ class JSON_API_BuddypressRead_Controller {
         }
 
         /**
-         * Returns a String containing an error message
-         * @param String $sModule Modules name
-         * @param type $iCode Errorcode
+         * Method to handle calls for the library
+         * @param String $sName name of the static method to call
+         * @param Array $aArguments arguments for the method
+         * @return return value of static library function, otherwise null
          */
-        private function error ( $sModule, $iCode ) {
-                $oReturn = new stdClass();
-                $oReturn->status = "error";
-                switch ( $sModule ) {
-                        case "activity":
-                                $oReturn->msg = __ ( 'No Activities found.' );
-                                break;
-                        case "profile":
-                                switch ( $iCode ) {
-                                        case 0:
-                                                $oReturn->msg = __ ( 'No Profile found.' );
-                                                break;
-                                        case 1:
-                                                $oReturn->msg = __ ( 'Username not found.' );
-                                                break;
-                                }
+        public function __call ( $sName, $aArguments ) {
+                if ( class_exists ( "JSON_API_FOR_BUDDYPRESS_FUNCTION" ) &&
+                        method_exists ( JSON_API_FOR_BUDDYPRESS_FUNCTION, $sName ) &&
+                        is_callable ( "JSON_API_FOR_BUDDYPRESS_FUNCTION::" . $sName ) ) {
+                        try {
+                                return call_user_func_array ( "JSON_API_FOR_BUDDYPRESS_FUNCTION::" . $sName, $aArguments );
+                        } catch ( Exception $e ) {
+                                $oReturn = new stdClass();
+                                $oReturn->status = "error";
+                                $oReturn->msg = $e->getMessage ();
+                                die ( json_encode ( $oReturn ) );
+                        }
                 }
-                if ( $oReturn->msg == "" )
-                        $oReturn->msg = __ ( 'An undefined error occured.' );
-                return $oReturn;
+                else
+                        return NULL;
+        }
+
+        /**
+         * Method to handle calls for parameters
+         * @param String $sName Name of the variable
+         * @return mixed value of the variable, otherwise null
+         */
+        public function __get ( $sName ) {
+                return isset ( JSON_API_FOR_BUDDYPRESS_FUNCTION::$sVars[ $sName ] ) ? JSON_API_FOR_BUDDYPRESS_FUNCTION::$sVars[ $sName ] : NULL;
         }
 
 }
