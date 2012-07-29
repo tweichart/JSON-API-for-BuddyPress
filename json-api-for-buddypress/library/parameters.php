@@ -21,5 +21,16 @@ $aParams = array (
         'string' => array (
             'username' => false
         )
+    ),
+    'message' => array (
+        'string' => array (
+            'box' => 'inbox'
+        ),
+        'int' => array (
+            'per_page' => 10
+        ),
+        'boolean' => array (
+            'limit' => false
+        )
     )
 );

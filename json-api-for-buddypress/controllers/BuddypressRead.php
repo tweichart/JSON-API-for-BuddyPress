@@ -122,6 +122,44 @@ class JSON_API_BuddypressRead_Controller {
                 }
                 return $oReturn;
         }
+        
+        /**
+         * Returns an object with messages for the current user
+         * @return Object Messages
+         */
+        public function get_messages () {
+                /* Possible parameters:
+                 * String box: the box you the messages are in (possible values are 'inbox', 'sentbox', 'notices', default is 'inbox')
+                 * int per_page: items to be displayed per page (default 10)
+                 * boolean limit: maximum numbers of emtries (default no limit)
+                 */
+                $this->initVars ( 'message' );
+                $oReturn = new stdClass();
+
+                $aParams [ 'box' ] = $this->box;
+                $aParams [ 'per_page' ] = $this->per_page;
+                $aParams [ 'max' ] = $this->limit;
+
+                if ( bp_has_message_threads ( $aParams ) ) {
+                        while ( bp_message_threads () ) {
+                                bp_message_thread ();
+                                $aTemp = new stdClass();
+
+                                $aTemp->id = bp_get_message_thread_id ();
+                                $aTemp->from = bp_get_message_thread_from ();
+                                $aTemp->to = bp_get_message_thread_to ();
+                                $aTemp->subject = bp_get_message_thread_subject ();
+                                $aTemp->excerpt = bp_get_message_thread_excerpt ();
+                                $aTemp->link = bp_get_message_thread_view_link ();
+
+                                $oReturn->messages [ ] = $aTemp;
+                        }
+                }
+                else {
+                        return $this->error ( 'message' );
+                }
+                return $oReturn;
+        }
 
         /**
          * Method to handle calls for the library
