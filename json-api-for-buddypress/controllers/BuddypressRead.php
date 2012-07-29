@@ -122,7 +122,7 @@ class JSON_API_BuddypressRead_Controller {
                 }
                 return $oReturn;
         }
-        
+
         /**
          * Returns an object with messages for the current user
          * @return Object Messages
@@ -158,6 +158,30 @@ class JSON_API_BuddypressRead_Controller {
                 else {
                         return $this->error ( 'message' );
                 }
+                return $oReturn;
+        }
+
+        /**
+         * Returns an object with notifications for the current user
+         * @return Object Notifications
+         */
+        public function get_notifications () {
+                /* Possible parameters:
+                 * none
+                 */
+                $oReturn = new stdClass();
+
+                $aNotifications = bp_core_get_notifications_for_user ( get_current_user_id () );
+
+                if ( empty ( $aNotifications ) )
+                        return $this->error ( 'notification' );
+
+                foreach ( $aNotifications as $sNotificationMessage ) {
+                        $oTemp = new stdClass();
+                        $oTemp->msg = $sNotificationMessage;
+                        $oReturn->notifications [ ] = $oTemp;
+                }
+
                 return $oReturn;
         }
 

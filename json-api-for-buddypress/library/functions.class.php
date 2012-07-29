@@ -82,6 +82,9 @@ class JSON_API_FOR_BUDDYPRESS_FUNCTION extends JSON_API_BuddypressRead_Controlle
                         case "message":
                                 $oReturn->msg = __ ( 'No messages found.' );
                                 break;
+                        case "notification":
+                                $oReturn->msg = __ ( 'No notifications found.' );
+                                break;
                         default:
                                 $oReturn->msg = __ ( 'An undefined error occured.' );
                 }
