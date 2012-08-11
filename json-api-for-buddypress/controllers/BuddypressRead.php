@@ -5,9 +5,9 @@
   Controller description: Buddypress controller for reading actions
  */
 
-require_once JSON_API_FOR_BUDDYPRESS_HOME . '/library/functions.class.php';
+require_once JSON_API_FOR_BUDDYPRESS_HOME . '/library/base.class.php';
 
-class JSON_API_BuddypressRead_Controller {
+class JSON_API_BuddypressRead_Controller extends JSON_API_for_BuddyPress_Base {
 
         /**
          * Returns an object with all activities
@@ -27,7 +27,6 @@ class JSON_API_BuddypressRead_Controller {
                  * int secondaryitemid: secondary object ID to filter on e.g. a post_id (default unset)
                  */
 
-                $oReturn = new stdClass();
                 $this->initVars ( 'activity' );
 
                 if ( !bp_has_activities () )
@@ -54,12 +53,12 @@ class JSON_API_BuddypressRead_Controller {
                                 $aParams[ 'per_page' ] = $iLimit;
                         $aTempActivities = bp_activity_get ( $aParams );
                         if ( !empty ( $aTempActivities[ 'activities' ] ) ) {
-                                $oReturn->activities [ 0 ] = $aTempActivities[ 'activities' ];
+                                $this->oReturn->activities [ 0 ] = $aTempActivities[ 'activities' ];
                         }
                         else {
                                 return $this->error ( 'activity' );
                         }
-                        return $oReturn;
+                        return $this->oReturn;
                 }
 
                 for ( $i = 1; $i <= $iPages; $i++ ) {
@@ -76,13 +75,13 @@ class JSON_API_BuddypressRead_Controller {
                                         break;
                         }
                         else {
-                                $oReturn->activities [ $i ] = $aTempActivities[ 'activities' ];
+                                $this->oReturn->activities [ $i ] = $aTempActivities[ 'activities' ];
                                 if ( $bLastRun )
                                         break;
                         }
                 }
 
-                return $oReturn;
+                return $this->oReturn;
         }
 
         /**
@@ -94,7 +93,6 @@ class JSON_API_BuddypressRead_Controller {
                  * String username: the username you want information from (required)
                  */
                 $this->initVars ( 'profile' );
-                $oReturn = new stdClass();
 
                 if ( $this->username === false || !username_exists ( $this->username ) ) {
                         return $this->error ( 'profile', 1 );
@@ -116,11 +114,11 @@ class JSON_API_BuddypressRead_Controller {
                                         if ( bp_field_has_data () ) {
                                                 $sFieldValue = bp_get_the_profile_field_value ();
                                         }
-                                        $oReturn->groups->$sGroupName->$sFieldName = $sFieldValue;
+                                        $this->oReturn->groups->$sGroupName->$sFieldName = $sFieldValue;
                                 }
                         }
                 }
-                return $oReturn;
+                return $this->oReturn;
         }
 
         /**
@@ -134,7 +132,6 @@ class JSON_API_BuddypressRead_Controller {
                  * boolean limit: maximum numbers of emtries (default no limit)
                  */
                 $this->initVars ( 'message' );
-                $oReturn = new stdClass();
 
                 $aParams [ 'box' ] = $this->box;
                 $aParams [ 'per_page' ] = $this->per_page;
@@ -152,13 +149,13 @@ class JSON_API_BuddypressRead_Controller {
                                 $aTemp->excerpt = bp_get_message_thread_excerpt ();
                                 $aTemp->link = bp_get_message_thread_view_link ();
 
-                                $oReturn->messages [ ] = $aTemp;
+                                $this->oReturn->messages [ ] = $aTemp;
                         }
                 }
                 else {
                         return $this->error ( 'message' );
                 }
-                return $oReturn;
+                return $this->oReturn;
         }
 
         /**
@@ -169,7 +166,6 @@ class JSON_API_BuddypressRead_Controller {
                 /* Possible parameters:
                  * none
                  */
-                $oReturn = new stdClass();
 
                 $aNotifications = bp_core_get_notifications_for_user ( get_current_user_id () );
 
@@ -179,10 +175,10 @@ class JSON_API_BuddypressRead_Controller {
                 foreach ( $aNotifications as $sNotificationMessage ) {
                         $oTemp = new stdClass();
                         $oTemp->msg = $sNotificationMessage;
-                        $oReturn->notifications [ ] = $oTemp;
+                        $this->oReturn->notifications [ ] = $oTemp;
                 }
 
-                return $oReturn;
+                return $this->oReturn;
         }
 
         /**
@@ -191,22 +187,22 @@ class JSON_API_BuddypressRead_Controller {
          * @param Array $aArguments arguments for the method
          * @return return value of static library function, otherwise null
          */
-        public function __call ( $sName, $aArguments ) {
-                if ( class_exists ( "JSON_API_FOR_BUDDYPRESS_FUNCTION" ) &&
-                        method_exists ( JSON_API_FOR_BUDDYPRESS_FUNCTION, $sName ) &&
-                        is_callable ( "JSON_API_FOR_BUDDYPRESS_FUNCTION::" . $sName ) ) {
-                        try {
-                                return call_user_func_array ( "JSON_API_FOR_BUDDYPRESS_FUNCTION::" . $sName, $aArguments );
-                        } catch ( Exception $e ) {
-                                $oReturn = new stdClass();
-                                $oReturn->status = "error";
-                                $oReturn->msg = $e->getMessage ();
-                                die ( json_encode ( $oReturn ) );
-                        }
-                }
-                else
-                        return NULL;
-        }
+        /* public function __call ( $sName, $aArguments ) {
+          if ( class_exists ( "JSON_API_FOR_BUDDYPRESS_FUNCTION" ) &&
+          method_exists ( JSON_API_FOR_BUDDYPRESS_FUNCTION, $sName ) &&
+          is_callable ( "JSON_API_FOR_BUDDYPRESS_FUNCTION::" . $sName ) ) {
+          try {
+          return call_user_func_array ( "JSON_API_FOR_BUDDYPRESS_FUNCTION::" . $sName, $aArguments );
+          } catch ( Exception $e ) {
+          $this->oReturn = new stdClass();
+          $this->oReturn->status = "error";
+          $this->oReturn->msg = $e->getMessage ();
+          die ( json_encode ( $this->oReturn ) );
+          }
+          }
+          else
+          return NULL;
+          } */
 
         /**
          * Method to handle calls for parameters
@@ -214,7 +210,7 @@ class JSON_API_BuddypressRead_Controller {
          * @return mixed value of the variable, otherwise null
          */
         public function __get ( $sName ) {
-                return isset ( JSON_API_FOR_BUDDYPRESS_FUNCTION::$sVars[ $sName ] ) ? JSON_API_FOR_BUDDYPRESS_FUNCTION::$sVars[ $sName ] : NULL;
+                return isset ( $this->sVars[ $sName ] ) ? $this->sVars[ $sName ] : NULL;
         }
 
 }

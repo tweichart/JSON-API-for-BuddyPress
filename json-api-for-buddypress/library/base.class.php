@@ -3,11 +3,12 @@
 class JSON_API_for_BuddyPress_Base {
 
         protected $sVars = array ( );
-		protected $this->oReturn = "";
+        protected $oReturn = "";
 
-		public function __construct(){
-				$this->oReturn = new stdClass();
-		}
+        public function __construct () {
+                $this->oReturn = new stdClass();
+        }
+
         /**
          * Load the Parameters defined in parameters.php
          * @param String $sModule the module to load
@@ -91,6 +92,7 @@ class JSON_API_for_BuddyPress_Base {
                         default:
                                 $this->oReturn->msg = __ ( 'An undefined error occured.' );
                 }
+                $this->oReturn->msg = isset ( $this->oReturn->msg ) ? $this->oReturn->msg : __ ( 'An undefined error occured.' );
                 return $this->oReturn;
         }
 
