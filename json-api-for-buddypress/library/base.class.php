@@ -89,6 +89,9 @@ class JSON_API_for_BuddyPress_Base {
                         case "notification":
                                 $this->oReturn->msg = __ ( 'No notifications found.' );
                                 break;
+                        case "friend":
+                                $this->oReturn->msg = __('No friends found.');
+                                break;
                         default:
                                 $this->oReturn->msg = __ ( 'An undefined error occured.' );
                 }

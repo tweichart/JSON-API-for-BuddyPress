@@ -181,28 +181,15 @@ class JSON_API_BuddypressRead_Controller extends JSON_API_for_BuddyPress_Base {
                 return $this->oReturn;
         }
 
-        /**
-         * Method to handle calls for the library
-         * @param String $sName name of the static method to call
-         * @param Array $aArguments arguments for the method
-         * @return return value of static library function, otherwise null
-         */
-        /* public function __call ( $sName, $aArguments ) {
-          if ( class_exists ( "JSON_API_FOR_BUDDYPRESS_FUNCTION" ) &&
-          method_exists ( JSON_API_FOR_BUDDYPRESS_FUNCTION, $sName ) &&
-          is_callable ( "JSON_API_FOR_BUDDYPRESS_FUNCTION::" . $sName ) ) {
-          try {
-          return call_user_func_array ( "JSON_API_FOR_BUDDYPRESS_FUNCTION::" . $sName, $aArguments );
-          } catch ( Exception $e ) {
-          $this->oReturn = new stdClass();
-          $this->oReturn->status = "error";
-          $this->oReturn->msg = $e->getMessage ();
-          die ( json_encode ( $this->oReturn ) );
-          }
-          }
-          else
-          return NULL;
-          } */
+        public function get_friends () {
+                $this->initVars ( 'friend' );
+
+                if ( $this->username == 0 ) {
+                        $iUserID = bp_loggedin_user_id ();
+                }
+                if ( !friends_check_user_has_friends ( $iUserID ) )
+                        return $this->error ( 'friend' );
+        }
 
         /**
          * Method to handle calls for parameters

@@ -32,5 +32,18 @@ $aParams = array (
         'boolean' => array (
             'limit' => false
         )
+    ),
+    'friend' => array(
+        'string' => array(
+            'username' => 0
+        ),
+        'int' => array(
+            'per_page' => 10,
+            'pages' => 1,
+            'limit' => 0
+        ),
+        'boolean' => array(
+            'only_requests' => false
+        )
     )
 );
