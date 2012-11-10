@@ -369,3 +369,14 @@ footer a:hover {
 
 /* Mobile Portrait Size to Mobile Landscape Size (devices and browsers) */
 @media only screen and (max-width: 479px) {}
+
+#button_paypal{
+	margin: 0 auto;
+}
+
+#form_paypal{
+	width: 100%;
+	text-align: center;
+	background: transparent;
+	padding: 0px;
+}
