@@ -5,9 +5,9 @@
   Controller description: Buddypress controller for reading actions
  */
 
-require_once JSON_API_FOR_BUDDYPRESS_HOME . '/library/base.class.php';
+require_once JSON_API_FOR_BUDDYPRESS_HOME . '/library/functions.class.php';
 
-class JSON_API_BuddypressRead_Controller extends JSON_API_for_BuddyPress_Base {
+class JSON_API_BuddypressRead_Controller {
 
         /**
          * Returns an object with all activities
@@ -27,6 +27,7 @@ class JSON_API_BuddypressRead_Controller extends JSON_API_for_BuddyPress_Base {
                  * int secondaryitemid: secondary object ID to filter on e.g. a post_id (default unset)
                  */
 
+                $oReturn = new stdClass();
                 $this->initVars ( 'activity' );
 
                 if ( !bp_has_activities () )
@@ -53,12 +54,12 @@ class JSON_API_BuddypressRead_Controller extends JSON_API_for_BuddyPress_Base {
                                 $aParams[ 'per_page' ] = $iLimit;
                         $aTempActivities = bp_activity_get ( $aParams );
                         if ( !empty ( $aTempActivities[ 'activities' ] ) ) {
-                                $this->oReturn->activities [ 0 ] = $aTempActivities[ 'activities' ];
+                                $oReturn->activities [ 0 ] = $aTempActivities[ 'activities' ];
                         }
                         else {
                                 return $this->error ( 'activity' );
                         }
-                        return $this->oReturn;
+                        return $oReturn;
                 }
 
                 for ( $i = 1; $i <= $iPages; $i++ ) {
@@ -75,13 +76,13 @@ class JSON_API_BuddypressRead_Controller extends JSON_API_for_BuddyPress_Base {
                                         break;
                         }
                         else {
-                                $this->oReturn->activities [ $i ] = $aTempActivities[ 'activities' ];
+                                $oReturn->activities [ $i ] = $aTempActivities[ 'activities' ];
                                 if ( $bLastRun )
                                         break;
                         }
                 }
 
-                return $this->oReturn;
+                return $oReturn;
         }
 
         /**
@@ -93,6 +94,7 @@ class JSON_API_BuddypressRead_Controller extends JSON_API_for_BuddyPress_Base {
                  * String username: the username you want information from (required)
                  */
                 $this->initVars ( 'profile' );
+                $oReturn = new stdClass();
 
                 if ( $this->username === false || !username_exists ( $this->username ) ) {
                         return $this->error ( 'profile', 1 );
@@ -114,11 +116,11 @@ class JSON_API_BuddypressRead_Controller extends JSON_API_for_BuddyPress_Base {
                                         if ( bp_field_has_data () ) {
                                                 $sFieldValue = bp_get_the_profile_field_value ();
                                         }
-                                        $this->oReturn->groups->$sGroupName->$sFieldName = $sFieldValue;
+                                        $oReturn->groups->$sGroupName->$sFieldName = $sFieldValue;
                                 }
                         }
                 }
-                return $this->oReturn;
+                return $oReturn;
         }
 
         /**
@@ -132,6 +134,7 @@ class JSON_API_BuddypressRead_Controller extends JSON_API_for_BuddyPress_Base {
                  * boolean limit: maximum numbers of emtries (default no limit)
                  */
                 $this->initVars ( 'message' );
+                $oReturn = new stdClass();
 
                 $aParams [ 'box' ] = $this->box;
                 $aParams [ 'per_page' ] = $this->per_page;
@@ -149,13 +152,13 @@ class JSON_API_BuddypressRead_Controller extends JSON_API_for_BuddyPress_Base {
                                 $aTemp->excerpt = bp_get_message_thread_excerpt ();
                                 $aTemp->link = bp_get_message_thread_view_link ();
 
-                                $this->oReturn->messages [ ] = $aTemp;
+                                $oReturn->messages [ ] = $aTemp;
                         }
                 }
                 else {
                         return $this->error ( 'message' );
                 }
-                return $this->oReturn;
+                return $oReturn;
         }
 
         /**
@@ -166,6 +169,7 @@ class JSON_API_BuddypressRead_Controller extends JSON_API_for_BuddyPress_Base {
                 /* Possible parameters:
                  * none
                  */
+                $oReturn = new stdClass();
 
                 $aNotifications = bp_core_get_notifications_for_user ( get_current_user_id () );
 
@@ -175,20 +179,117 @@ class JSON_API_BuddypressRead_Controller extends JSON_API_for_BuddyPress_Base {
                 foreach ( $aNotifications as $sNotificationMessage ) {
                         $oTemp = new stdClass();
                         $oTemp->msg = $sNotificationMessage;
-                        $this->oReturn->notifications [ ] = $oTemp;
+                        $oReturn->notifications [ ] = $oTemp;
                 }
 
-                return $this->oReturn;
+                return $oReturn;
+        }
+        
+        
+        /**
+         * Returns an object with friends for the given user
+         * @return Object Friends
+         */
+        public function get_friends(){
+                /* Possible parameters:
+                 * String username: the username you want information from (required)
+                 */
+                $this->initVars ( 'friends' );
+                $oReturn = new stdClass();
+                
+                if ( $this->username === false || !username_exists ( $this->username ) ) {
+                        return $this->error ( 'friends', 0);
+                }
+                
+                $oUser = get_user_by ( 'login', $this->username );
+                
+                $sFriends = bp_get_friend_ids($oUser->data->ID);
+                $aFriends = explode(",", $sFriends);
+                if ($aFriends[0] == "")
+                    return $this->error('friends', 1);
+                foreach ($aFriends as $sFriendID){
+                    $oReturn->friends [] = (int) $sFriendID;
+                }
+                $oReturn->count = count($oReturn->friends);
+                return $oReturn;
+        }
+        
+        /**
+         * Returns an object with friendship requests for the given user
+         * @return Object Friends
+         */
+        public function get_friendship_request(){
+                /* Possible parameters:
+                 * String username: the username you want information from (required)
+                 */
+                $this->initVars ( 'friends' );
+                $oReturn = new stdClass();
+                
+                if ( $this->username === false || !username_exists ( $this->username ) ) {
+                        return $this->error ( 'friends', 0);
+                }
+                $oUser = get_user_by ( 'login', $this->username );
+                
+                $sFriends = bp_get_friendship_requests($oUser->data->ID);
+                $aFriends = explode(",", $sFriends);
+                var_dump($aFriends);
+                if ($aFriends[0] == "0")
+                    return $this->error('friends', 2);
+                foreach ($aFriends as $sFriendID){
+                    $oReturn->friends [] = (int) $sFriendID;
+                }
+                $oReturn->count = count($oReturn->friends);
+                return $oReturn;
+        }
+        
+        /**
+         * Returns an object with the status of friendship of the two users
+         * @return Object Friends
+         */
+        public function get_friendship_status(){
+                /* Possible parameters:
+                 * String username: the username you want information from (required)
+                 * String friendname: the name of the possible friend (required)
+                 */
+                $this->initVars ( 'friends' );
+                $oReturn = new stdClass();
+                
+                if ( $this->username === false || !username_exists ( $this->username ) ) {
+                        return $this->error ( 'friends', 0);
+                }
+                
+                if ( $this->friendname === false || !username_exists ( $this->friendname ) ) {
+                        return $this->error ( 'friends', 3);
+                }
+                
+                $oUser = get_user_by ( 'login', $this->username );
+                $oUserFriend = get_user_by ( 'login', $this->friendname );
+                
+                $oReturn->friendshipstatus = friends_check_friendship_status($oUser->data->ID, $oUserFriend->data->ID);
+                return $oReturn;
         }
 
-        public function get_friends () {
-                $this->initVars ( 'friend' );
-
-                if ( $this->username == 0 ) {
-                        $iUserID = bp_loggedin_user_id ();
+        /**
+         * Method to handle calls for the library
+         * @param String $sName name of the static method to call
+         * @param Array $aArguments arguments for the method
+         * @return return value of static library function, otherwise null
+         */
+        public function __call ( $sName, $aArguments ) {
+                if ( class_exists ( "JSON_API_FOR_BUDDYPRESS_FUNCTION" ) &&
+                        method_exists ( JSON_API_FOR_BUDDYPRESS_FUNCTION, $sName ) &&
+                        is_callable ( "JSON_API_FOR_BUDDYPRESS_FUNCTION::" . $sName ) ) {
+                        try {
+                                return call_user_func_array ( "JSON_API_FOR_BUDDYPRESS_FUNCTION::" . $sName, $aArguments );
+                        } catch ( Exception $e ) {
+                                $oReturn = new stdClass();
+                                $oReturn->status = "error";
+                                $oReturn->msg = $e->getMessage ();
+                                die ( json_encode ( $oReturn ) );
+                        }
                 }
-                if ( !friends_check_user_has_friends ( $iUserID ) )
-                        return $this->error ( 'friend' );
+                else
+                        return NULL;
         }
 
         /**
@@ -197,7 +298,7 @@ class JSON_API_BuddypressRead_Controller extends JSON_API_for_BuddyPress_Base {
          * @return mixed value of the variable, otherwise null
          */
         public function __get ( $sName ) {
-                return isset ( $this->sVars[ $sName ] ) ? $this->sVars[ $sName ] : NULL;
+                return isset ( JSON_API_FOR_BUDDYPRESS_FUNCTION::$sVars[ $sName ] ) ? JSON_API_FOR_BUDDYPRESS_FUNCTION::$sVars[ $sName ] : NULL;
         }
 
 }
