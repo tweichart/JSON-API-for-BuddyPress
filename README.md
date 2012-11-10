@@ -26,6 +26,9 @@ To install JSON API for BuddyPress just follow these steps:
 
 ==Release Notes==
 
+===0.5===
+* extended functionality for friends
+
 ===0.4===
 * extended functionality for messages / notifications
 * reworked the framework
