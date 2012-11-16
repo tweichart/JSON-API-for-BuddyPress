@@ -55,5 +55,22 @@ $aParams = array(
             'groupid' => false,
             'limit' => false
         )
+    ),
+    'forums' => array(
+        'string' => array(
+            'groupslug' => false,
+            'forumslug' => false,
+            'type' => 'newest',
+            'tagname' => false,
+            'topicslug' => false,
+            'order' => 'asc'
+        ),
+        'int' => array(
+            'groupid' => false,
+            'forumid' => false,
+            'page' => 1,
+            'per_page' => 15,
+            'topicid' => 0
+        )
     )
 );

@@ -9,6 +9,7 @@ require_once JSON_API_FOR_BUDDYPRESS_HOME . '/library/functions.class.php';
 
 class JSON_API_BuddypressRead_Controller {
 
+    //tbd: check results for type
     /**
      * Returns an object with all activities
      * @return Object Activities
@@ -195,7 +196,7 @@ class JSON_API_BuddypressRead_Controller {
         $oReturn = new stdClass();
 
         if ($this->username === false || !username_exists($this->username)) {
-            return $this->error('friends', 0);
+            return $this->error('friend', 0);
         }
 
         $oUser = get_user_by('login', $this->username);
@@ -203,7 +204,7 @@ class JSON_API_BuddypressRead_Controller {
         $sFriends = bp_get_friend_ids($oUser->data->ID);
         $aFriends = explode(",", $sFriends);
         if ($aFriends[0] == "")
-            return $this->error('friends', 1);
+            return $this->error('friend', 1);
         foreach ($aFriends as $sFriendID) {
             $oReturn->friends [] = (int) $sFriendID;
         }
@@ -223,14 +224,14 @@ class JSON_API_BuddypressRead_Controller {
         $oReturn = new stdClass();
 
         if ($this->username === false || !username_exists($this->username)) {
-            return $this->error('friends', 0);
+            return $this->error('friend', 0);
         }
         $oUser = get_user_by('login', $this->username);
 
         $sFriends = bp_get_friendship_requests($oUser->data->ID);
         $aFriends = explode(",", $sFriends);
         if ($aFriends[0] == "0")
-            return $this->error('friends', 2);
+            return $this->error('friend', 2);
         foreach ($aFriends as $sFriendID) {
             $oReturn->friends [] = (int) $sFriendID;
         }
@@ -251,11 +252,11 @@ class JSON_API_BuddypressRead_Controller {
         $oReturn = new stdClass();
 
         if ($this->username === false || !username_exists($this->username)) {
-            return $this->error('friends', 0);
+            return $this->error('friend', 0);
         }
 
         if ($this->friendname === false || !username_exists($this->friendname)) {
-            return $this->error('friends', 3);
+            return $this->error('friend', 3);
         }
 
         $oUser = get_user_by('login', $this->username);
@@ -264,6 +265,8 @@ class JSON_API_BuddypressRead_Controller {
         $oReturn->friendshipstatus = friends_check_friendship_status($oUser->data->ID, $oUserFriend->data->ID);
         return $oReturn;
     }
+    
+    //tbd: slug check
 
     /**
      * Returns an object with groups matching to the given parameters
@@ -293,7 +296,7 @@ class JSON_API_BuddypressRead_Controller {
         $aGroups = groups_get_groups($aParams);
 
         if ($aGroups['total'] == "0")
-            return $this->error('groups', 0);
+            return $this->error('group', 0);
 
         foreach ($aGroups['groups'] as $aGroup) {
             $oReturn->groups [] = $aGroup;
@@ -320,14 +323,14 @@ class JSON_API_BuddypressRead_Controller {
         $oReturn = new stdClass();
 
         if ($this->username === false || !username_exists($this->username)) {
-            return $this->error('groups', 1);
+            return $this->error('group', 1);
         }
         $oUser = get_user_by('login', $this->username);
 
         $mGroupName = $this->get_group_from_params();
 
         if ($mGroupName !== true)
-            return $this->error('groups', $mGroupName);
+            return $this->error('group', $mGroupName);
 
         if ($this->type === false || $this->type != "sent" || $this->type != "all")
             $this->type = 'sent';
@@ -353,14 +356,14 @@ class JSON_API_BuddypressRead_Controller {
         $oReturn = new stdClass();
 
         if ($this->username === false || !username_exists($this->username)) {
-            return $this->error('groups', 1);
+            return $this->error('group', 1);
         }
         $oUser = get_user_by('login', $this->username);
 
         $mGroupName = $this->get_group_from_params();
 
         if ($mGroupName !== true)
-            return $this->error('groups', $mGroupName);
+            return $this->error('group', $mGroupName);
 
         $oReturn->membership_requested = groups_check_for_membership_request((int) $oUser->data->ID, $this->groupid);
         $oReturn->membership_requested = is_null($oReturn->membership_requested) ? false : true;
@@ -384,7 +387,7 @@ class JSON_API_BuddypressRead_Controller {
         $mGroupName = $this->get_group_from_params();
 
         if ($mGroupName !== true)
-            return $this->error('groups', $mGroupName);
+            return $this->error('group', $mGroupName);
 
         $oReturn->group_admins = groups_get_group_admins($this->groupid);
         return $oReturn;
@@ -406,7 +409,7 @@ class JSON_API_BuddypressRead_Controller {
         $mGroupName = $this->get_group_from_params();
 
         if ($mGroupName !== true)
-            return $this->error('groups', $mGroupName);
+            return $this->error('group', $mGroupName);
 
         $oReturn->group_mods = groups_get_group_mods($this->groupid);
         return $oReturn;
@@ -429,7 +432,7 @@ class JSON_API_BuddypressRead_Controller {
         $mGroupName = $this->get_group_from_params();
 
         if ($mGroupName !== true)
-            return $this->error('groups', $mGroupName);
+            return $this->error('group', $mGroupName);
         $aMembers = groups_get_group_members($this->groupid, $this->limit);
         if ($aMembers === false) {
             $oReturn->group_members = array();
@@ -444,6 +447,190 @@ class JSON_API_BuddypressRead_Controller {
 
         return $oReturn;
     }
+    
+    /**
+     * Returns an object containing info about the forum
+     * @return Object Forum
+     */
+    public function groupforum_get_forum(){
+        /* Possible parameters:
+         * int forumid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)
+         * String forumslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)
+         */
+        $this->initVars('forums');
+        
+        $oReturn = new stdClass();
+        
+        $mForumExists = $this->groupforum_check_forum_existence();
+
+        if ($mForumExists !== true)
+            return $this->error('forum', $mForumExists );
+        $oForum = bp_forums_get_forum((int) $this->forumid);
+        
+        $oReturn->forum->id = (int) $oForum->forum_id;
+        $oReturn->forum->name = $oForum->forum_name;
+        $oReturn->forum->slug = $oForum->forum_slug;
+        $oReturn->forum->description = $oForum->forum_desc;
+        $oReturn->forum->topics_count = (int) $oForum->topics;
+        $oReturn->forum->post_count = (int) $oForum->posts;
+        return $oReturn;
+    }
+    
+    /**
+     * Returns an object containing info about the forum
+     * @return Object Forum
+     */
+    public function groupforum_get_forum_by_group(){
+        /* Possible parameters:
+         * int groupid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)
+         * String groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)
+         */
+        $this->initVars('forums');
+        
+        $oReturn = new stdClass();
+
+        $mGroupName = $this->get_group_from_params();
+        if ($mGroupName !== true)
+            return $this->error('forum', $mGroupName);
+        
+        $oGroup = groups_get_group(array('group_id' => $this->groupid));
+        if ($oGroup->enable_forum == "0")
+            return $this->error('forum', 0);
+        $iForumId = groups_get_groupmeta($oGroup->id, 'forum_id');
+        if ($iForumId == "0")
+            return $this->error('forum', 1);
+        $oForum = bp_forums_get_forum((int) $iForumId);
+        
+        $oReturn->forum->id = (int) $oForum->forum_id;
+        $oReturn->forum->name = $oForum->forum_name;
+        $oReturn->forum->slug = $oForum->forum_slug;
+        $oReturn->forum->description = $oForum->forum_desc;
+        $oReturn->forum->topics_count = (int) $oForum->topics;
+        $oReturn->forum->post_count = (int) $oForum->posts;
+        return $oReturn;
+    }
+    
+    /**
+     * Returns an array containing the topics
+     * @return Array topics
+     */
+    public function groupforum_get_forum_topics(){
+        /* Possible parameters:
+         * int forumid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)
+         * String forumslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)
+         * int page: the page number you want to display (default 1)
+         * int per_page: the number of results you want per page (default 15)
+         * String type: newest, popular, unreplied, tag (default newest)
+         * String tagname: just used if type = tag
+         */
+        $this->initVars('forums');
+        
+        $oReturn = new stdClass();
+        
+        $mForumExists = $this->groupforum_check_forum_existence();
+
+        if ($mForumExists !== true)
+            return $this->error('forum', $mForumExists );
+
+        $aConfig = array();
+        $aConfig['type'] = $this->type;
+        $aConfig['filter'] = $this->type == 'tag' ? $this->tagname : false;
+        $aConfig['forum_id'] = $this->forumid;
+        $aConfig['page'] = $this->page;
+        $aConfig['per_page'] = $this->per_page;
+        
+        $aTopics = bp_forums_get_forum_topics($aConfig);
+        if (is_null($aTopics))
+            $this->error('forum', 7);
+        foreach ($aTopics as $key=>$aTopic){
+            $oReturn->topics[$key]->id = (int) $aTopic->topic_id;
+            $oReturn->topics[$key]->title = $aTopic->topic_title;
+            $oReturn->topics[$key]->slug = $aTopic->topic_slug;
+            $oReturn->topics[$key]->poster = $aTopic->topic_poster;
+            $oReturn->topics[$key]->post_count = $aTopic->topic_posts;
+            
+        }
+        $oReturn->count = count($aTopics);
+        return $oReturn;
+    }
+    
+    /**
+     * Returns an object containing the topic with it's details
+     * @return Object topic
+     */
+    public function groupforum_get_topic_details(){
+        /* Possible parameters:
+         * int topicid: the topicid you are searching for (if not set, topicslug is searched; topicid or topicslug required)
+         * String topicslug: the slug to search for (just used if topicid is not set; topicid or topicslugs required)
+         */
+        $this->initVars('forums');
+        
+        $oReturn = new stdClass();
+        
+        $mTopicExists = $this->groupforum_check_topic_existence();
+        if ($mTopicExists !== true)
+            $this->error('forum', $mTopicExists);
+        
+        $oTopic = bp_forums_get_topic_details($this->topicid);
+        
+        $oReturn->topic->id = (int) $oTopic->topic_id;
+        $oReturn->topic->title = $oTopic->topic_title;
+        $oReturn->topic->slug = $oTopic->topic_slug;
+        $oReturn->topic->poster[]->id = (int) $oTopic->topic_poster;
+        $oReturn->topic->poster[]->name = $oTopic->topic_poster_name;
+        $oReturn->topic->last_poster[]->id = (int) $oTopic->topic_last_poster;
+        $oReturn->topic->last_poster[]->name = $oTopic->topic_last_poster_name;
+        $oReturn->topic->start_time = $oTopic->topic_start_time;
+        $oReturn->topic->forum_id = (int) $oTopic->forum_id;
+        $oReturn->topic->topic_status = $oTopic->topic_status;
+        $oReturn->topic->is_open = (int) $oTopic->topic_open === 1 ? true : false;
+        $oReturn->topic->is_sticky = (int) $oTopic->topic_sticky === 1 ? true : false;
+        $oReturn->topic->count_posts = (int) $oTopic->topic_posts;
+        
+        return $oReturn;
+    }
+    
+    /**
+     * Returns an arary containing the posts
+     * @return Array posts
+     */
+    public function groupforum_get_posts(){
+        /* Possible parameters:
+         * int topicid: the topicid you are searching for (if not set, topicslug is searched; topicid or topicslug required)
+         * String topicslug: the slug to search for (just used if topicid is not set; topicid or topicslugs required)
+         * int page: the page number you want to display (default 1)
+         * int per_page: the number of results you want per page (default 15)
+         * String order: desc for descending or asc for ascending (default asc)
+         */
+        $this->initVars('forums');
+        
+        $oReturn = new stdClass();
+        
+        $mTopicExists = $this->groupforum_check_topic_existence();
+        if ($mTopicExists !== true)
+            $this->error('forum', $mTopicExists);
+        
+        $aConfig = array();
+        $aConfig['topic_id'] = $this->topicid;
+        $aConfig['page'] = $this->page;
+        $aConfig['per_page'] = $this->per_page;
+        $aConfig['order'] = $this->order;
+        $aPosts = bp_forums_get_topic_posts($aConfig);
+        
+        foreach ($aPosts as $key=>$oPost){
+            $oReturn->post[$key]->id = (int) $oPost->post_id;
+            $oReturn->post[$key]->topicid = (int) $oPost->topic_id;
+            $oReturn->post[$key]->poster[]->id = (int) $oPost->poster_id;
+            $oReturn->post[$key]->poster[]->username = $oPost->poster_login;
+            $oReturn->post[$key]->poster[]->name = $oPost->poster_name;
+            $oReturn->post[$key]->post_text = $oPost->post_text;
+            $oReturn->post[$key]->post_time = $oPost->post_time;
+            $oReturn->post[$key]->post_position = (int) $oPost->post_position;
+        }
+        $oReturn->count = count($aPosts);
+        
+        return $oReturn;
+    }
 
     /**
      * Method to handle calls for the library
@@ -452,6 +639,7 @@ class JSON_API_BuddypressRead_Controller {
      * @return return value of static library function, otherwise null
      */
     public function __call($sName, $aArguments) {
+        //tbd check if module active
         if (class_exists("JSON_API_FOR_BUDDYPRESS_FUNCTION") &&
                 method_exists(JSON_API_FOR_BUDDYPRESS_FUNCTION, $sName) &&
                 is_callable("JSON_API_FOR_BUDDYPRESS_FUNCTION::" . $sName)) {
