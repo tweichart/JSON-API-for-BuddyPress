@@ -229,7 +229,6 @@ class JSON_API_BuddypressRead_Controller {
 
         $sFriends = bp_get_friendship_requests($oUser->data->ID);
         $aFriends = explode(",", $sFriends);
-        var_dump($aFriends);
         if ($aFriends[0] == "0")
             return $this->error('friends', 2);
         foreach ($aFriends as $sFriendID) {
@@ -325,19 +324,123 @@ class JSON_API_BuddypressRead_Controller {
         }
         $oUser = get_user_by('login', $this->username);
 
-        if ($this->groupid === false && $this->groupslug === false)
-            return $this->error('groups', 2);
+        $mGroupName = $this->get_group_from_params();
 
-        if (groups_get_group(array('group_id' => $this->groupid))) {
-            $this->groupid = groups_get_id(sanitize_title($this->groupslug));
-            if ($this->groupid === 0)
-                return $this->error('groups', 3);
-        }
+        if ($mGroupName !== true)
+            return $this->error('groups', $mGroupName);
+
         if ($this->type === false || $this->type != "sent" || $this->type != "all")
             $this->type = 'sent';
 
         $oReturn->is_invited = groups_check_user_has_invite((int) $oUser->data->ID, $this->groupid, $this->type);
         $oReturn->is_invited = is_null($oReturn->is_invited) ? false : true;
+
+        return $oReturn;
+    }
+
+    /**
+     * Returns a boolean with the result of the match
+     * @return boolean membership_requested
+     */
+    public function check_user_membership_request_to_group() {
+        /* Possible parameters:
+         * String username: the username you want information from (required)
+         * int groupid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)
+         * String groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)
+         */
+        $this->initVars('groups');
+
+        $oReturn = new stdClass();
+
+        if ($this->username === false || !username_exists($this->username)) {
+            return $this->error('groups', 1);
+        }
+        $oUser = get_user_by('login', $this->username);
+
+        $mGroupName = $this->get_group_from_params();
+
+        if ($mGroupName !== true)
+            return $this->error('groups', $mGroupName);
+
+        $oReturn->membership_requested = groups_check_for_membership_request((int) $oUser->data->ID, $this->groupid);
+        $oReturn->membership_requested = is_null($oReturn->membership_requested) ? false : true;
+
+        return $oReturn;
+    }
+
+    /**
+     * Returns an array containing all admins for the given group
+     * @return Array group_admins
+     */
+    public function get_group_admins() {
+        /* Possible parameters:
+         * int groupid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)
+         * String groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)
+         */
+        $this->initVars('groups');
+
+        $oReturn = new stdClass();
+
+        $mGroupName = $this->get_group_from_params();
+
+        if ($mGroupName !== true)
+            return $this->error('groups', $mGroupName);
+
+        $oReturn->group_admins = groups_get_group_admins($this->groupid);
+        return $oReturn;
+    }
+
+    /**
+     * Returns an array containing all mods for the given group
+     * @return Array group_mods
+     */
+    public function get_group_mods() {
+        /* Possible parameters:
+         * int groupid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)
+         * String groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)
+         */
+        $this->initVars('groups');
+
+        $oReturn = new stdClass();
+
+        $mGroupName = $this->get_group_from_params();
+
+        if ($mGroupName !== true)
+            return $this->error('groups', $mGroupName);
+
+        $oReturn->group_mods = groups_get_group_mods($this->groupid);
+        return $oReturn;
+    }
+
+    /**
+     * Returns an array containing all members for the given group
+     * @return Array group_members
+     */
+    public function get_group_members() {
+        /* Possible parameters:
+         * int groupid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)
+         * String groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)
+         * int limit: maximum members displayed
+         */
+        $this->initVars('groups');
+
+        $oReturn = new stdClass();
+
+        $mGroupName = $this->get_group_from_params();
+
+        if ($mGroupName !== true)
+            return $this->error('groups', $mGroupName);
+        $aMembers = groups_get_group_members($this->groupid, $this->limit);
+        if ($aMembers === false) {
+            $oReturn->group_members = array();
+            $oReturn->count = 0;
+            return $oReturn;
+        }
+
+        foreach ($aMembers['members'] as $aMember) {
+            $oReturn->group_members[] = $aMember;
+        }
+        $oReturn->count = $aMembers['count'];
 
         return $oReturn;
     }

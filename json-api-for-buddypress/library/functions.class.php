@@ -57,6 +57,18 @@ class JSON_API_FOR_BUDDYPRESS_FUNCTION extends JSON_API_BuddypressRead_Controlle
         return $mValue;
     }
 
+    protected static function get_group_from_params() {
+        if (self::$sVars ['groupid'] === false && self::$sVars ['groupslug'] === false)
+            return 2;
+
+        if (groups_get_group(array('group_id' => self::$sVars ['groupid']))) {
+            self::$sVars ['groupid'] = groups_get_id(sanitize_title(self::$sVars ['groupslug']));
+            if (self::$sVars ['groupid'] === 0)
+                return 3;
+        }
+        return true;
+    }
+
     /**
      * Returns a String containing an error message
      * @param String $sModule Modules name
@@ -113,7 +125,10 @@ class JSON_API_FOR_BUDDYPRESS_FUNCTION extends JSON_API_BuddypressRead_Controlle
                         $oReturn->msg = __('Neither groupname nor groupslug are set.');
                         break;
                     case 3:
-                        $oReturn->msg = __('Could not find group.');
+                        $oReturn->msg = __('Group not found.');
+                        break;
+                    case 4:
+                        $oReturn->msg = __('No Members in Group');
                         break;
                 }
                 break;

@@ -52,7 +52,8 @@ $aParams = array(
         'int' => array(
             'per_page' => '',
             'page' => 1,
-            'groupid' => false
+            'groupid' => false,
+            'limit' => false
         )
     )
 );
