@@ -17,12 +17,12 @@ $aParams = array(
             'secondaryitemid' => false
         )
     ),
-    'profile' => array(
+    'xprofile' => array(
         'string' => array(
             'username' => false
         )
     ),
-    'message' => array(
+    'messages' => array(
         'string' => array(
             'box' => 'inbox'
         ),
@@ -77,9 +77,10 @@ $aParams = array(
             'display_content' => false
         )
     ),
-    'setting' => array(
+    'settings' => array(
         'string' => array(
             'username' => false
         )
-    )
+    ),
+    'notifications' => array()
 );

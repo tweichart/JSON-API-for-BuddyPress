@@ -29,7 +29,7 @@ class JSON_API_BuddypressRead_Controller {
          */
 
         $oReturn = new stdClass();
-        $this->initVars('activity');
+        $this->init('activity', 'see_activity');
 
         if (!bp_has_activities())
             return $this->error('activity');
@@ -93,17 +93,17 @@ class JSON_API_BuddypressRead_Controller {
         /* Possible parameters:
          * String username: the username you want information from (required)
          */
-        $this->initVars('profile');
+        $this->init('xprofile');
         $oReturn = new stdClass();
 
         if ($this->username === false || !username_exists($this->username)) {
-            return $this->error('profile', 1);
+            return $this->error('xprofile', 1);
         }
 
         $oUser = get_user_by('login', $this->username);
 
         if (!bp_has_profile(array('user_id' => $oUser->data->ID))) {
-            return $this->error('profile', 0);
+            return $this->error('xprofile', 0);
         }
 
         while (bp_profile_groups(array('user_id' => $oUser->data->ID))) {
@@ -133,7 +133,7 @@ class JSON_API_BuddypressRead_Controller {
          * int per_page: items to be displayed per page (default 10)
          * boolean limit: maximum numbers of emtries (default no limit)
          */
-        $this->initVars('message');
+        $this->init('messages');
         $oReturn = new stdClass();
 
         $aParams ['box'] = $this->box;
@@ -155,7 +155,7 @@ class JSON_API_BuddypressRead_Controller {
                 $oReturn->messages [] = $aTemp;
             }
         } else {
-            return $this->error('message');
+            return $this->error('messages');
         }
         return $oReturn;
     }
@@ -168,18 +168,19 @@ class JSON_API_BuddypressRead_Controller {
         /* Possible parameters:
          * none
          */
+        $this->init('notifications');
         $oReturn = new stdClass();
 
         $aNotifications = bp_core_get_notifications_for_user(get_current_user_id());
 
-        if (empty($aNotifications))
-            return $this->error('notification');
+        if (empty($aNotifications)) {
+            return $this->error('notifications');
+        }
 
         foreach ($aNotifications as $sNotificationMessage) {
-            $oTemp = new stdClass();
-            $oTemp->msg = $sNotificationMessage;
-            $oReturn->notifications [] = $oTemp;
+            $oReturn->notifications [] = $sNotificationMessage;
         }
+        $oReturn->count = count($aNotifications);
 
         return $oReturn;
     }
@@ -192,11 +193,11 @@ class JSON_API_BuddypressRead_Controller {
         /* Possible parameters:
          * String username: the username you want information from (required)
          */
-        $this->initVars('friends');
+        $this->init('friends');
         $oReturn = new stdClass();
 
         if ($this->username === false || !username_exists($this->username)) {
-            return $this->error('friend', 0);
+            return $this->error('friends', 0);
         }
 
         $oUser = get_user_by('login', $this->username);
@@ -204,7 +205,7 @@ class JSON_API_BuddypressRead_Controller {
         $sFriends = bp_get_friend_ids($oUser->data->ID);
         $aFriends = explode(",", $sFriends);
         if ($aFriends[0] == "")
-            return $this->error('friend', 1);
+            return $this->error('friends', 1);
         foreach ($aFriends as $sFriendID) {
             $oReturn->friends [] = (int) $sFriendID;
         }
@@ -220,18 +221,22 @@ class JSON_API_BuddypressRead_Controller {
         /* Possible parameters:
          * String username: the username you want information from (required)
          */
-        $this->initVars('friends');
+        $this->init('friends');
         $oReturn = new stdClass();
 
         if ($this->username === false || !username_exists($this->username)) {
-            return $this->error('friend', 0);
+            return $this->error('friends', 0);
         }
         $oUser = get_user_by('login', $this->username);
 
+        if (!is_user_logged_in() || get_current_user_id() != $oUser->data->ID)
+            return $this->error('base', 0);
+
         $sFriends = bp_get_friendship_requests($oUser->data->ID);
         $aFriends = explode(",", $sFriends);
+
         if ($aFriends[0] == "0")
-            return $this->error('friend', 2);
+            return $this->error('friends', 2);
         foreach ($aFriends as $sFriendID) {
             $oReturn->friends [] = (int) $sFriendID;
         }
@@ -248,16 +253,19 @@ class JSON_API_BuddypressRead_Controller {
          * String username: the username you want information from (required)
          * String friendname: the name of the possible friend (required)
          */
-        $this->initVars('friends');
+        $this->init('friends');
         $oReturn = new stdClass();
 
         if ($this->username === false || !username_exists($this->username)) {
-            return $this->error('friend', 0);
+            return $this->error('friends', 0);
         }
 
         if ($this->friendname === false || !username_exists($this->friendname)) {
-            return $this->error('friend', 3);
+            return $this->error('friends', 3);
         }
+
+        if (!is_user_logged_in() || get_current_user_id() != $oUser->data->ID)
+            return $this->error('base', 0);
 
         $oUser = get_user_by('login', $this->username);
         $oUserFriend = get_user_by('login', $this->friendname);
@@ -280,7 +288,7 @@ class JSON_API_BuddypressRead_Controller {
          * int page: The page to return if limiting per page (default 1)
          * int per_page: The number of results to return per page (default 20)
          */
-        $this->initVars('groups');
+        $this->init('groups');
         $oReturn = new stdClass();
 
         if ($this->username !== false || username_exists($this->username)) {
@@ -296,10 +304,19 @@ class JSON_API_BuddypressRead_Controller {
         $aGroups = groups_get_groups($aParams);
 
         if ($aGroups['total'] == "0")
-            return $this->error('group', 0);
+            return $this->error('groups', 0);
 
         foreach ($aGroups['groups'] as $aGroup) {
-            $oReturn->groups [] = $aGroup;
+            $oReturn->groups[(int) $aGroup->id]->name = $aGroup->name;
+            $oReturn->groups[(int) $aGroup->id]->description = $aGroup->description;
+            $oReturn->groups[(int) $aGroup->id]->status = $aGroup->status;
+            if ($aGroup->status == "private" && !is_user_logged_in() && !$aGroup->is_member === true)
+                continue;
+            $oReturn->groups[(int) $aGroup->id]->creator = (int) $aGroup->creator_id;
+            $oReturn->groups[(int) $aGroup->id]->slug = $aGroup->slug;
+            $oReturn->groups[(int) $aGroup->id]->is_forum_enabled = $aGroup->enable_forum == "1" ? true : false;
+            $oReturn->groups[(int) $aGroup->id]->date_created = $aGroup->date_created;
+            $oReturn->groups[(int) $aGroup->id]->count_member = $aGroup->total_member_count;
         }
 
         $oReturn->count = (int) $aGroups['total'];
@@ -318,19 +335,19 @@ class JSON_API_BuddypressRead_Controller {
          * String groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)
          * String type: sent to check for sent invites, all to check for all
          */
-        $this->initVars('groups');
+        $this->init('groups');
 
         $oReturn = new stdClass();
 
         if ($this->username === false || !username_exists($this->username)) {
-            return $this->error('group', 1);
+            return $this->error('groups', 1);
         }
         $oUser = get_user_by('login', $this->username);
 
         $mGroupName = $this->get_group_from_params();
 
         if ($mGroupName !== true)
-            return $this->error('group', $mGroupName);
+            return $this->error('groups', $mGroupName);
 
         if ($this->type === false || $this->type != "sent" || $this->type != "all")
             $this->type = 'sent';
@@ -351,19 +368,19 @@ class JSON_API_BuddypressRead_Controller {
          * int groupid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)
          * String groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)
          */
-        $this->initVars('groups');
+        $this->init('groups');
 
         $oReturn = new stdClass();
 
         if ($this->username === false || !username_exists($this->username)) {
-            return $this->error('group', 1);
+            return $this->error('groups', 1);
         }
         $oUser = get_user_by('login', $this->username);
 
         $mGroupName = $this->get_group_from_params();
 
         if ($mGroupName !== true)
-            return $this->error('group', $mGroupName);
+            return $this->error('groups', $mGroupName);
 
         $oReturn->membership_requested = groups_check_for_membership_request((int) $oUser->data->ID, $this->groupid);
         $oReturn->membership_requested = is_null($oReturn->membership_requested) ? false : true;
@@ -380,16 +397,21 @@ class JSON_API_BuddypressRead_Controller {
          * int groupid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)
          * String groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)
          */
-        $this->initVars('groups');
+        $this->init('groups');
 
         $oReturn = new stdClass();
 
-        $mGroupName = $this->get_group_from_params();
+        $mGroupExists = $this->get_group_from_params();
 
-        if ($mGroupName !== true)
-            return $this->error('group', $mGroupName);
+        if ($mGroupExists === false)
+            return $this->error('base', 0);
+        else if (is_int($mGroupExists) && $mGroupExists !== true)
+            return $this->error('groups', $mGroupExists);
 
-        $oReturn->group_admins = groups_get_group_admins($this->groupid);
+        $aGroupAdmins = groups_get_group_admins($this->groupid);
+        foreach ($aGroupAdmins as $oGroupAdmin) {
+            $oReturn->group_admins[(int) $oGroupAdmin->user_id] = get_user_by('id', $oGroupAdmin->user_id)->data->user_login;
+        }
         return $oReturn;
     }
 
@@ -402,16 +424,22 @@ class JSON_API_BuddypressRead_Controller {
          * int groupid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)
          * String groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)
          */
-        $this->initVars('groups');
+        $this->init('groups');
 
         $oReturn = new stdClass();
 
-        $mGroupName = $this->get_group_from_params();
+        $mGroupExists = $this->get_group_from_params();
 
-        if ($mGroupName !== true)
-            return $this->error('group', $mGroupName);
+        if ($mGroupExists === false)
+            return $this->error('base', 0);
+        else if (is_int($mGroupExists) && $mGroupExists !== true)
+            return $this->error('groups', $mGroupExists);
 
         $oReturn->group_mods = groups_get_group_mods($this->groupid);
+        $aGroupMods = groups_get_group_mods($this->groupid);
+        foreach ($aGroupMods as $aGroupMod) {
+            $oReturn->group_mods[(int) $aGroupMod->user_id] = get_user_by('id', $aGroupMod->user_id)->data->user_login;
+        }
         return $oReturn;
     }
 
@@ -425,14 +453,17 @@ class JSON_API_BuddypressRead_Controller {
          * String groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)
          * int limit: maximum members displayed
          */
-        $this->initVars('groups');
+        $this->init('groups');
 
         $oReturn = new stdClass();
 
-        $mGroupName = $this->get_group_from_params();
+        $mGroupExists = $this->get_group_from_params();
 
-        if ($mGroupName !== true)
-            return $this->error('group', $mGroupName);
+        if ($mGroupExists === false)
+            return $this->error('base', 0);
+        else if (is_int($mGroupExists) && $mGroupExists !== true)
+            return $this->error('groups', $mGroupExists);
+
         $aMembers = groups_get_group_members($this->groupid, $this->limit);
         if ($aMembers === false) {
             $oReturn->group_members = array();
@@ -457,14 +488,17 @@ class JSON_API_BuddypressRead_Controller {
          * int forumid: the forumid you are searching for (if not set, forumslug is searched; forumid or forumslug required)
          * String forumslug: the slug to search for (just used if forumid is not set; forumid or forumslug required)
          */
-        $this->initVars('forums');
+        $this->init('forums');
 
         $oReturn = new stdClass();
 
         $mForumExists = $this->groupforum_check_forum_existence();
 
-        if ($mForumExists !== true)
-            return $this->error('forum', $mForumExists);
+        if ($mForumExists === false)
+            return $this->error('base', 0);
+        else if (is_int($mForumExists) && $mForumExists !== true)
+            return $this->error('forums', $mForumExists);
+
         $oForum = bp_forums_get_forum((int) $this->forumid);
 
         $oReturn->forum->id = (int) $oForum->forum_id;
@@ -485,14 +519,14 @@ class JSON_API_BuddypressRead_Controller {
          * int forumid: the forumid you are searching for (if not set, forumslug is searched; forumid or forumslug required)
          * String forumslug: the slug to search for (just used if forumid is not set; forumid or forumslug required)
          */
-        $this->initVars('forums');
+        $this->init('forums');
 
         $oReturn = new stdClass();
 
         $mForumExists = $this->sitewideforum_check_forum_existence();
 
         if ($mForumExists !== true)
-            return $this->error('forum', $mForumExists);
+            return $this->error('forums', $mForumExists);
         foreach ($this->forumid as $iId) {
             $oForum = bbp_get_forum((int) $iId);
             $oReturn->forum[$iId]->id = (int) $oForum->ID;
@@ -520,7 +554,7 @@ class JSON_API_BuddypressRead_Controller {
         /* Possible parameters:
          * int parentid: all children of the given id (default 0 = all)
          */
-        $this->initVars('forums');
+        $this->init('forums');
 
         $oReturn = new stdClass();
         global $wpdb;
@@ -532,7 +566,7 @@ class JSON_API_BuddypressRead_Controller {
                 ));
 
         if (empty($aForums))
-            return $this->error('forum', 9);
+            return $this->error('forums', 9);
 
         foreach ($aForums as $aForum) {
             $iId = (int) $aForum->ID;
@@ -554,20 +588,23 @@ class JSON_API_BuddypressRead_Controller {
          * int groupid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)
          * String groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)
          */
-        $this->initVars('forums');
+        $this->init('forums');
 
         $oReturn = new stdClass();
 
-        $mGroupName = $this->get_group_from_params();
-        if ($mGroupName !== true)
-            return $this->error('forum', $mGroupName);
+        $mGroupExists = $this->get_group_from_params();
+
+        if ($mGroupExists === false)
+            return $this->error('base', 0);
+        else if (is_int($mGroupExists) && $mGroupExists !== true)
+            return $this->error('forums', $mGroupExists);
 
         $oGroup = groups_get_group(array('group_id' => $this->groupid));
         if ($oGroup->enable_forum == "0")
-            return $this->error('forum', 0);
+            return $this->error('forums', 0);
         $iForumId = groups_get_groupmeta($oGroup->id, 'forum_id');
         if ($iForumId == "0")
-            return $this->error('forum', 1);
+            return $this->error('forums', 1);
         $oForum = bp_forums_get_forum((int) $iForumId);
 
         $oReturn->forum->id = (int) $oForum->forum_id;
@@ -592,14 +629,16 @@ class JSON_API_BuddypressRead_Controller {
          * String type: newest, popular, unreplied, tag (default newest)
          * String tagname: just used if type = tag
          */
-        $this->initVars('forums');
+        $this->init('forums');
 
         $oReturn = new stdClass();
 
         $mForumExists = $this->groupforum_check_forum_existence();
 
-        if ($mForumExists !== true)
-            return $this->error('forum', $mForumExists);
+        if ($mForumExists === false)
+            return $this->error('base', 0);
+        else if (is_int($mForumExists) && $mForumExists !== true)
+            return $this->error('forums', $mForumExists);
 
         $aConfig = array();
         $aConfig['type'] = $this->type;
@@ -610,7 +649,7 @@ class JSON_API_BuddypressRead_Controller {
 
         $aTopics = bp_forums_get_forum_topics($aConfig);
         if (is_null($aTopics))
-            $this->error('forum', 7);
+            $this->error('forums', 7);
         foreach ($aTopics as $key => $aTopic) {
             $oReturn->topics[$key]->id = (int) $aTopic->topic_id;
             $oReturn->topics[$key]->title = $aTopic->topic_title;
@@ -632,14 +671,14 @@ class JSON_API_BuddypressRead_Controller {
          * String forumslug: the slug to search for (just used if forumid is not set; forumid or forumslug required)
          * boolean display_content: set this to true if you want the content to be displayed too (default false)
          */
-        $this->initVars('forums');
+        $this->init('forums');
 
         $oReturn = new stdClass();
 
         $mForumExists = $this->sitewideforum_check_forum_existence();
 
         if ($mForumExists !== true)
-            return $this->error('forum', $mForumExists);
+            return $this->error('forums', $mForumExists);
         global $wpdb;
         foreach ($this->forumid as $iId) {
             $aTopics = $wpdb->get_results($wpdb->prepare(
@@ -675,13 +714,16 @@ class JSON_API_BuddypressRead_Controller {
          * int topicid: the topicid you are searching for (if not set, topicslug is searched; topicid or topicslug required)
          * String topicslug: the slug to search for (just used if topicid is not set; topicid or topicslugs required)
          */
-        $this->initVars('forums');
+        $this->init('forums');
 
         $oReturn = new stdClass();
 
         $mTopicExists = $this->groupforum_check_topic_existence();
-        if ($mTopicExists !== true)
-            $this->error('forum', $mTopicExists);
+
+        if ($mTopicExists === false)
+            return $this->error('base', 0);
+        else if (is_int($mTopicExists) && $mTopicExists !== true)
+            return $this->error('forums', $mTopicExists);
 
         $oTopic = bp_forums_get_topic_details($this->topicid);
 
@@ -714,13 +756,15 @@ class JSON_API_BuddypressRead_Controller {
          * int per_page: the number of results you want per page (default 15)
          * String order: desc for descending or asc for ascending (default asc)
          */
-        $this->initVars('forums');
+        $this->init('forums');
 
         $oReturn = new stdClass();
 
         $mTopicExists = $this->groupforum_check_topic_existence();
-        if ($mTopicExists !== true)
-            $this->error('forum', $mTopicExists);
+        if ($mTopicExists === false)
+            return $this->error('base', 0);
+        else if (is_int($mTopicExists) && $mTopicExists !== true)
+            return $this->error('forums', $mTopicExists);
 
         $aConfig = array();
         $aConfig['topic_id'] = $this->topicid;
@@ -757,14 +801,14 @@ class JSON_API_BuddypressRead_Controller {
          * String topicslug: the slug to search for (just used if topicid is not set; topicid or topicslug required)
          * boolean display_content: set this to true if you want the content to be displayed too (default false)
          */
-        $this->initVars('forums');
+        $this->init('forums');
 
         $oReturn = new stdClass();
 
         $mForumExists = $this->sitewideforum_check_topic_existence();
 
         if ($mForumExists !== true)
-            return $this->error('forum', $mForumExists);
+            return $this->error('forums', $mForumExists);
         foreach ($this->topicid as $iId) {
             global $wpdb;
             $aReplies = $wpdb->get_results($wpdb->prepare(
@@ -795,17 +839,20 @@ class JSON_API_BuddypressRead_Controller {
     }
 
     public function get_settings() {
-        /* Possible parameters:
-         * String username: the username you want information from (required)
+        /* Possible Parameters:
+         * none
          */
-        $this->initVars('setting');
+        $this->init('settings');
         $oReturn = new stdClass();
 
         if ($this->username === false || !username_exists($this->username)) {
-            return $this->error('setting', 0);
+            return $this->error('settings', 0);
         }
 
         $oUser = get_user_by('login', $this->username);
+
+        if (!is_user_logged_in() || get_current_user_id() != $oUser->data->ID)
+            return $this->error('base', 0);
 
         $oReturn->user->mail = $oUser->data->user_email;
 

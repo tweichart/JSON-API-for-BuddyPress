@@ -9,7 +9,10 @@ class JSON_API_FOR_BUDDYPRESS_FUNCTION extends JSON_API_BuddypressRead_Controlle
      * @param String $sModule the module to load
      * @throws Exception if parameters for module aren't defined
      */
-    protected static function initVars($sModule) {
+    protected static function init($sModule) {
+        global $json_api;
+        if (!self::checkModuleActive($sModule))
+            $json_api->error("The BuddyPress module '" . $sModule . "' has to be enabled to use this function.");
         require_once (JSON_API_FOR_BUDDYPRESS_HOME . '/library/parameters.php');
 
         if (!isset($aParams [$sModule]))
@@ -20,6 +23,16 @@ class JSON_API_FOR_BUDDYPRESS_FUNCTION extends JSON_API_BuddypressRead_Controlle
                 self::$sVars [$sValName] = self::getVar($sValName, $sVal, $sType);
             }
         }
+    }
+
+    private function checkModuleActive($sModule) {
+        if ($sModule != 'notifications' && !key_exists($sModule, bp_get_option('bp-active-components'))) {
+            if ($sModule == 'forums')
+                if (!function_exists("bbp_version"))
+                    return false;
+            return false;
+        }
+        return true;
     }
 
     private static function getVar($sValName, $sVal, $sType) {
@@ -65,10 +78,14 @@ class JSON_API_FOR_BUDDYPRESS_FUNCTION extends JSON_API_BuddypressRead_Controlle
             self::$sVars ['groupid'] = groups_get_id(sanitize_title(self::$sVars ['groupslug']));
             if (self::$sVars ['groupid'] === 0)
                 return 3;
+            else
+                $oGroup = groups_get_group(array('group_id' => self::$sVars ['groupid']));
         }
         else {
-            self::$sVars['groupslug'] = $oGroup->slug;
+            self::$sVars ['groupid'] = $oGroup->id;
         }
+        if ($oGroup->status == 'private' && !$oGroup->is_member)
+            return false;
         return true;
     }
 
@@ -86,6 +103,10 @@ class JSON_API_FOR_BUDDYPRESS_FUNCTION extends JSON_API_BuddypressRead_Controlle
         } else {
             self::$sVars['forumid'] = $oForum->id;
         }
+        $iGroupId = groups_get_id(sanitize_title(self::$sVars ['groupslug']));
+        $oGroup = groups_get_group(array('group_id' => $iGroupId));
+        if ($oGroup->status == 'private' && !$oGroup->is_member)
+            return false;
         return true;
     }
 
@@ -124,11 +145,15 @@ class JSON_API_FOR_BUDDYPRESS_FUNCTION extends JSON_API_BuddypressRead_Controlle
             $iTopicId = bb_get_id_from_slug('topic', sanitize_title(self::$sVars['topicslug']));
             if ($iTopicId === 0)
                 return 8;
-            else
+            else {
                 self::$sVars['topicid'] = $iTopicId;
+                $oTopic = bp_forums_get_topic_details(self::$sVars['topicid']);
+            }
         }
         else
             self::$sVars['topicid'] = $oTopic->id;
+        if (is_null($oTopic))
+            return false;
         return true;
     }
 
@@ -179,7 +204,7 @@ class JSON_API_FOR_BUDDYPRESS_FUNCTION extends JSON_API_BuddypressRead_Controlle
             case "activity":
                 $oReturn->msg = __('No Activities found.');
                 break;
-            case "profile":
+            case "xprofile":
                 switch ($iCode) {
                     case 0:
                         $oReturn->msg = __('No Profile found.');
@@ -189,13 +214,13 @@ class JSON_API_FOR_BUDDYPRESS_FUNCTION extends JSON_API_BuddypressRead_Controlle
                         break;
                 }
                 break;
-            case "message":
+            case "messages":
                 $oReturn->msg = __('No messages found.');
                 break;
-            case "notification":
+            case "notifications":
                 $oReturn->msg = __('No notifications found.');
                 break;
-            case "friend":
+            case "friends":
                 switch ($iCode) {
                     case 0:
                         $oReturn->msg = __('Username not found.');
@@ -211,7 +236,7 @@ class JSON_API_FOR_BUDDYPRESS_FUNCTION extends JSON_API_BuddypressRead_Controlle
                         break;
                 }
                 break;
-            case "group":
+            case "groups":
                 switch ($iCode) {
                     case 0:
                         $oReturn->msg = __('No groups found.');
@@ -230,7 +255,7 @@ class JSON_API_FOR_BUDDYPRESS_FUNCTION extends JSON_API_BuddypressRead_Controlle
                         break;
                 }
                 break;
-            case "forum":
+            case "forums":
                 switch ($iCode) {
                     case 0:
                         $oReturn->msg = __('Forums are disabled for this group.');
@@ -264,10 +289,17 @@ class JSON_API_FOR_BUDDYPRESS_FUNCTION extends JSON_API_BuddypressRead_Controlle
                         break;
                 }
                 break;
-            case "setting":
+            case "settings":
                 switch ($iCode) {
                     case 0:
                         $oReturn->msg = __('Username not found.');
+                        break;
+                }
+                break;
+            case "base":
+                switch ($iCode) {
+                    case 0:
+                        $oReturn->msg = __('You are not allowed to view this information.');
                         break;
                 }
                 break;

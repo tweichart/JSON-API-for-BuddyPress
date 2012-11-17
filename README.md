@@ -10,6 +10,9 @@ JSON API for BuddyPress is a plugin, that supports the JSON API Plugin with a ne
 For further information refer to the GitHub Project Page at http://tweichart.github.com/JSON-API-for-BuddyPress
 
 ==Release Notes==
+===0.9===
+* now checking for permissions bevore retrieving data (security)
+* need for authentication pushed to 2.0
 
 ===0.8===
 * extended functionality for settings
