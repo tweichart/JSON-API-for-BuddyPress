@@ -70,7 +70,11 @@ $aParams = array(
             'forumid' => false,
             'page' => 1,
             'per_page' => 15,
-            'topicid' => 0
+            'topicid' => 0,
+            'parentid' => false
+        ),
+        'boolean' => array(
+            'display_content' => false
         )
     )
 );

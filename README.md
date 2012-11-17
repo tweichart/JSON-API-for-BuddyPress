@@ -11,6 +11,9 @@ For further information refer to the GitHub Project Page at http://tweichart.git
 
 ==Release Notes==
 
+===0.7===
+* extended functionality for forums
+
 ===0.6===
 * extended functionality for groups
 

@@ -75,7 +75,7 @@ class JSON_API_FOR_BUDDYPRESS_FUNCTION extends JSON_API_BuddypressRead_Controlle
     protected static function groupforum_check_forum_existence(){
         if (self::$sVars['forumid'] === false && self::$sVars['forumslug'] === false)
             return 4;
-        $oForum = bp_forums_get_forum(self::$sVars['forumid'] === false );
+        $oForum = bp_forums_get_forum(self::$sVars['forumid']);
         if (is_null($oForum) || $oForum === false){
             $iForumId = bb_get_id_from_slug('forum', sanitize_title(self::$sVars['forumslug']));
             if ($iForumId === 0)
@@ -85,11 +85,39 @@ class JSON_API_FOR_BUDDYPRESS_FUNCTION extends JSON_API_BuddypressRead_Controlle
             }
         }
         else{
-            self::$sVars['forumid'] = $oGroup->id;
-            self::$sVars['forumslug'] = $oGroup->slug;
+            self::$sVars['forumid'] = $oForum->id;
         }
         return true;
     }
+    
+    protected static function sitewideforum_check_forum_existence(){
+        if (self::$sVars['forumid'] === false && self::$sVars['forumslug'] === false)
+            return 4;
+        $oForum = bbp_get_forum(self::$sVars['forumid']);
+        if (is_null($oForum)){
+            global $wpdb;
+            $aForums = $wpdb->get_results($wpdb->prepare(
+                "SELECT ID
+                 FROM   $wpdb->posts
+                 WHERE  post_type='forum'
+                 AND post_name='".self::$sVars['forumslug']."'"
+                ));            
+            if (empty($aForums))
+                return 5;
+            else {
+                self::$sVars['forumid'] = array();
+                foreach ($aForums as $aForum){
+                    self::$sVars['forumid'][] = $aForum->ID;
+                }
+            }
+        }
+        else{
+            self::$sVars['forumid'] = array();
+            self::$sVars['forumid'][] = $oForum->ID;
+        }
+        return true;
+    }
+    
     protected static function groupforum_check_topic_existence(){
         if (self::$sVars['topicid'] === false && self::$sVars['topicslug'] === false)
             return 6;
@@ -100,6 +128,44 @@ class JSON_API_FOR_BUDDYPRESS_FUNCTION extends JSON_API_BuddypressRead_Controlle
                 return 8;
             else
                 self::$sVars['topicid'] = $iTopicId;
+        }
+        else
+            self::$sVars['topicid'] = $oTopic->id;
+        return true;
+    }
+    
+    protected static function sitewideforum_check_topic_existence(){
+        if (self::$sVars['topicid'] === 0 && self::$sVars['topicslug'] === false)
+            return 6;
+        global $wpdb;
+        if (self::$sVars['topicid'] !== 0)
+        $oTopic = $wpdb->get_row($wpdb->prepare(
+                "SELECT ID
+                 FROM   $wpdb->posts
+                 WHERE  post_type='topic'
+                 AND id='".self::$sVars['topicid']."'"
+                ));
+        
+        if (is_null($oTopic)){
+            global $wpdb;
+            $aTopics = $wpdb->get_results($wpdb->prepare(
+                "SELECT ID
+                 FROM   $wpdb->posts
+                 WHERE  post_type='topic'
+                 AND post_name='".self::$sVars['topicslug']."'"
+                ));
+            if (empty($aTopics))
+                return 8;
+            else {
+                self::$sVars['topicid'] = array();
+                foreach ($aTopics as $aTopic){                    
+                    self::$sVars['topicid'][] = $aTopic->ID;
+                }
+            }
+        }
+        else{
+            self::$sVars['topicid'] = array();
+            self::$sVars['topicid'][] = $oTopic->ID;
         }
         return true;
     }
@@ -195,6 +261,9 @@ class JSON_API_FOR_BUDDYPRESS_FUNCTION extends JSON_API_BuddypressRead_Controlle
                         break;
                     case 8:
                         $oReturn->msg = __('No topics found.');
+                        break;
+                    case 9:
+                        $oReturn->msg = __('No forums found.');
                         break;
                 }
                 break;
