@@ -76,5 +76,10 @@ $aParams = array(
         'boolean' => array(
             'display_content' => false
         )
+    ),
+    'setting' => array(
+        'string' => array(
+            'username' => false
+        )
     )
 );

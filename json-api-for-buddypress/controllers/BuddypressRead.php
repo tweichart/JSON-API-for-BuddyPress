@@ -265,7 +265,7 @@ class JSON_API_BuddypressRead_Controller {
         $oReturn->friendshipstatus = friends_check_friendship_status($oUser->data->ID, $oUserFriend->data->ID);
         return $oReturn;
     }
-    
+
     //tbd: slug check
 
     /**
@@ -447,26 +447,26 @@ class JSON_API_BuddypressRead_Controller {
 
         return $oReturn;
     }
-    
+
     /**
      * Returns an object containing info about the forum
      * @return Object Forum
      */
-    public function groupforum_get_forum(){
+    public function groupforum_get_forum() {
         /* Possible parameters:
          * int forumid: the forumid you are searching for (if not set, forumslug is searched; forumid or forumslug required)
          * String forumslug: the slug to search for (just used if forumid is not set; forumid or forumslug required)
          */
         $this->initVars('forums');
-        
+
         $oReturn = new stdClass();
-        
+
         $mForumExists = $this->groupforum_check_forum_existence();
 
         if ($mForumExists !== true)
-            return $this->error('forum', $mForumExists );
+            return $this->error('forum', $mForumExists);
         $oForum = bp_forums_get_forum((int) $this->forumid);
-        
+
         $oReturn->forum->id = (int) $oForum->forum_id;
         $oReturn->forum->name = $oForum->forum_name;
         $oReturn->forum->slug = $oForum->forum_slug;
@@ -475,25 +475,25 @@ class JSON_API_BuddypressRead_Controller {
         $oReturn->forum->post_count = (int) $oForum->posts;
         return $oReturn;
     }
-    
+
     /**
      * Returns an object containing info about the forum
      * @return Object Forum
      */
-    public function sitewideforum_get_forum(){
+    public function sitewideforum_get_forum() {
         /* Possible parameters:
          * int forumid: the forumid you are searching for (if not set, forumslug is searched; forumid or forumslug required)
          * String forumslug: the slug to search for (just used if forumid is not set; forumid or forumslug required)
          */
         $this->initVars('forums');
-        
+
         $oReturn = new stdClass();
-        
+
         $mForumExists = $this->sitewideforum_check_forum_existence();
 
         if ($mForumExists !== true)
-            return $this->error('forum', $mForumExists );
-        foreach ($this->forumid as $iId){
+            return $this->error('forum', $mForumExists);
+        foreach ($this->forumid as $iId) {
             $oForum = bbp_get_forum((int) $iId);
             $oReturn->forum[$iId]->id = (int) $oForum->ID;
             $oReturn->forum[$iId]->title = $oForum->post_title;
@@ -503,40 +503,40 @@ class JSON_API_BuddypressRead_Controller {
             $oReturn->forum[$iId]->last_change = $oForum->post_modified;
             $oReturn->forum[$iId]->status = $oForum->post_status;
             $oReturn->forum[$iId]->name = $oForum->post_name;
-            $iTopicCount = bbp_get_forum_topic_count((int)$this->forumid);
+            $iTopicCount = bbp_get_forum_topic_count((int) $this->forumid);
             $oReturn->forum[$iId]->topics_count = is_null($iTopicCount) ? 0 : $iTopicCount;
-            $iPostCount = bbp_get_forum_post_count((int)$this->forumid);
+            $iPostCount = bbp_get_forum_post_count((int) $this->forumid);
             $oReturn->forum[$iId]->post_count = is_null($iPostCount) ? 0 : $iPostCount;
         }
-        
+
         return $oReturn;
     }
-    
+
     /**
      * Returns an object containing all forums
      * @return Object Forums
      */
-    public function sitewideforum_get_all_forums(){
+    public function sitewideforum_get_all_forums() {
         /* Possible parameters:
          * int parentid: all children of the given id (default 0 = all)
          */
         $this->initVars('forums');
-        
+
         $oReturn = new stdClass();
         global $wpdb;
-        $sParentQuery = $this->parentid === false ? "" : " AND post_parent=".(int)$this->parentid;
+        $sParentQuery = $this->parentid === false ? "" : " AND post_parent=" . (int) $this->parentid;
         $aForums = $wpdb->get_results($wpdb->prepare(
-                "SELECT ID, post_parent, post_author, post_title, post_date, post_modified
+                        "SELECT ID, post_parent, post_author, post_title, post_date, post_modified
                  FROM   $wpdb->posts
-                 WHERE  post_type='forum'".$sParentQuery
+                 WHERE  post_type='forum'" . $sParentQuery
                 ));
-        
+
         if (empty($aForums))
             return $this->error('forum', 9);
-        
-        foreach ($aForums as $aForum){
-            $iId = (int)$aForum->ID;
-            $oReturn->forums[$iId]['author'] = (int)$aForum->post_author;
+
+        foreach ($aForums as $aForum) {
+            $iId = (int) $aForum->ID;
+            $oReturn->forums[$iId]['author'] = (int) $aForum->post_author;
             $oReturn->forums[$iId]['date'] = $aForum->post_date;
             $oReturn->forums[$iId]['last_changes'] = $aForum->post_modified;
             $oReturn->forums[$iId]['title'] = $aForum->post_title;
@@ -544,24 +544,24 @@ class JSON_API_BuddypressRead_Controller {
         }
         return $oReturn;
     }
-    
+
     /**
      * Returns an object containing info about the forum
      * @return Object Forum
      */
-    public function groupforum_get_forum_by_group(){
+    public function groupforum_get_forum_by_group() {
         /* Possible parameters:
          * int groupid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)
          * String groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)
          */
         $this->initVars('forums');
-        
+
         $oReturn = new stdClass();
 
         $mGroupName = $this->get_group_from_params();
         if ($mGroupName !== true)
             return $this->error('forum', $mGroupName);
-        
+
         $oGroup = groups_get_group(array('group_id' => $this->groupid));
         if ($oGroup->enable_forum == "0")
             return $this->error('forum', 0);
@@ -569,7 +569,7 @@ class JSON_API_BuddypressRead_Controller {
         if ($iForumId == "0")
             return $this->error('forum', 1);
         $oForum = bp_forums_get_forum((int) $iForumId);
-        
+
         $oReturn->forum->id = (int) $oForum->forum_id;
         $oReturn->forum->name = $oForum->forum_name;
         $oReturn->forum->slug = $oForum->forum_slug;
@@ -578,12 +578,12 @@ class JSON_API_BuddypressRead_Controller {
         $oReturn->forum->post_count = (int) $oForum->posts;
         return $oReturn;
     }
-    
+
     /**
      * Returns an array containing the topics
      * @return Array topics
      */
-    public function groupforum_get_forum_topics(){
+    public function groupforum_get_forum_topics() {
         /* Possible parameters:
          * int forumid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)
          * String forumslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)
@@ -593,13 +593,13 @@ class JSON_API_BuddypressRead_Controller {
          * String tagname: just used if type = tag
          */
         $this->initVars('forums');
-        
+
         $oReturn = new stdClass();
-        
+
         $mForumExists = $this->groupforum_check_forum_existence();
 
         if ($mForumExists !== true)
-            return $this->error('forum', $mForumExists );
+            return $this->error('forum', $mForumExists);
 
         $aConfig = array();
         $aConfig['type'] = $this->type;
@@ -607,85 +607,84 @@ class JSON_API_BuddypressRead_Controller {
         $aConfig['forum_id'] = $this->forumid;
         $aConfig['page'] = $this->page;
         $aConfig['per_page'] = $this->per_page;
-        
+
         $aTopics = bp_forums_get_forum_topics($aConfig);
         if (is_null($aTopics))
             $this->error('forum', 7);
-        foreach ($aTopics as $key=>$aTopic){
+        foreach ($aTopics as $key => $aTopic) {
             $oReturn->topics[$key]->id = (int) $aTopic->topic_id;
             $oReturn->topics[$key]->title = $aTopic->topic_title;
             $oReturn->topics[$key]->slug = $aTopic->topic_slug;
             $oReturn->topics[$key]->poster = $aTopic->topic_poster;
             $oReturn->topics[$key]->post_count = $aTopic->topic_posts;
-            
         }
         $oReturn->count = count($aTopics);
         return $oReturn;
     }
-    
+
     /**
      * Returns an array containing all topics of a forum
      * @return Array Topics
      */
-    public function sitewideforum_get_forum_topics(){
+    public function sitewideforum_get_forum_topics() {
         /* Possible parameters:
          * int forumid: the forumid you are searching for (if not set, forumslug is searched; forumid or forumslug required)
          * String forumslug: the slug to search for (just used if forumid is not set; forumid or forumslug required)
          * boolean display_content: set this to true if you want the content to be displayed too (default false)
          */
         $this->initVars('forums');
-        
+
         $oReturn = new stdClass();
-        
+
         $mForumExists = $this->sitewideforum_check_forum_existence();
 
         if ($mForumExists !== true)
-            return $this->error('forum', $mForumExists );
+            return $this->error('forum', $mForumExists);
         global $wpdb;
-        foreach ($this->forumid as $iId){
+        foreach ($this->forumid as $iId) {
             $aTopics = $wpdb->get_results($wpdb->prepare(
-                    "SELECT ID, post_parent, post_author, post_title, post_date, post_modified, post_content
+                            "SELECT ID, post_parent, post_author, post_title, post_date, post_modified, post_content
                      FROM   $wpdb->posts
                      WHERE  post_type='topic'
-                     AND post_parent='".$iId."'"
+                     AND post_parent='" . $iId . "'"
                     ));
-            if (empty($aTopics)){
-                $oReturn->forums[(int)$iId]->topics = "";
+            if (empty($aTopics)) {
+                $oReturn->forums[(int) $iId]->topics = "";
                 continue;
             }
-            foreach ($aTopics as $aTopic){
-                $oReturn->forums[(int)$iId]->topics[(int)$aTopic->ID]['author'] = (int)$aTopic->post_author;
-                $oReturn->forums[(int)$iId]->topics[(int)$aTopic->ID]['date'] = $aTopic->post_date;
+            foreach ($aTopics as $aTopic) {
+                $oReturn->forums[(int) $iId]->topics[(int) $aTopic->ID]['author'] = (int) $aTopic->post_author;
+                $oReturn->forums[(int) $iId]->topics[(int) $aTopic->ID]['date'] = $aTopic->post_date;
                 if ($this->display_content !== false)
-                    $oReturn->forums[(int)$iId]->topics[(int)$aTopic->ID]['content'] = $aTopic->post_content;
-                $oReturn->forums[(int)$iId]->topics[(int)$aTopic->ID]['last_changes'] = $aTopic->post_modified;
-                $oReturn->forums[(int)$iId]->topics[(int)$aTopic->ID]['title'] = $aTopic->post_title;
-                $oReturn->forums[(int)$iId]->topics[(int)$aTopic->ID]['parent'] = (int) $aTopic->post_parent;
+                    $oReturn->forums[(int) $iId]->topics[(int) $aTopic->ID]['content'] = $aTopic->post_content;
+                $oReturn->forums[(int) $iId]->topics[(int) $aTopic->ID]['last_changes'] = $aTopic->post_modified;
+                $oReturn->forums[(int) $iId]->topics[(int) $aTopic->ID]['title'] = $aTopic->post_title;
+                $oReturn->forums[(int) $iId]->topics[(int) $aTopic->ID]['parent'] = (int) $aTopic->post_parent;
             }
-            $oReturn->forums[[(int)$iId]]->count = count($aTopics);
+            $oReturn->forums[[(int) $iId]]->count = count($aTopics);
         }
         return $oReturn;
     }
-    
+
     /**
      * Returns an object containing the topic with it's details
      * @return Object topic
      */
-    public function groupforum_get_topic_details(){
+    public function groupforum_get_topic_details() {
         /* Possible parameters:
          * int topicid: the topicid you are searching for (if not set, topicslug is searched; topicid or topicslug required)
          * String topicslug: the slug to search for (just used if topicid is not set; topicid or topicslugs required)
          */
         $this->initVars('forums');
-        
+
         $oReturn = new stdClass();
-        
+
         $mTopicExists = $this->groupforum_check_topic_existence();
         if ($mTopicExists !== true)
             $this->error('forum', $mTopicExists);
-        
+
         $oTopic = bp_forums_get_topic_details($this->topicid);
-        
+
         $oReturn->topic->id = (int) $oTopic->topic_id;
         $oReturn->topic->title = $oTopic->topic_title;
         $oReturn->topic->slug = $oTopic->topic_slug;
@@ -699,15 +698,15 @@ class JSON_API_BuddypressRead_Controller {
         $oReturn->topic->is_open = (int) $oTopic->topic_open === 1 ? true : false;
         $oReturn->topic->is_sticky = (int) $oTopic->topic_sticky === 1 ? true : false;
         $oReturn->topic->count_posts = (int) $oTopic->topic_posts;
-        
+
         return $oReturn;
     }
-    
+
     /**
      * Returns an arary containing the posts
      * @return Array posts
      */
-    public function groupforum_get_topic_posts(){
+    public function groupforum_get_topic_posts() {
         /* Possible parameters:
          * int topicid: the topicid you are searching for (if not set, topicslug is searched; topicid or topicslug required)
          * String topicslug: the slug to search for (just used if topicid is not set; topicid or topicslugs required)
@@ -716,23 +715,23 @@ class JSON_API_BuddypressRead_Controller {
          * String order: desc for descending or asc for ascending (default asc)
          */
         $this->initVars('forums');
-        
+
         $oReturn = new stdClass();
-        
+
         $mTopicExists = $this->groupforum_check_topic_existence();
         if ($mTopicExists !== true)
             $this->error('forum', $mTopicExists);
-        
+
         $aConfig = array();
         $aConfig['topic_id'] = $this->topicid;
         $aConfig['page'] = $this->page;
         $aConfig['per_page'] = $this->per_page;
         $aConfig['order'] = $this->order;
         $aPosts = bp_forums_get_topic_posts($aConfig);
-        
+
         $oReturn->post = array();
-        
-        foreach ($aPosts as $key=>$oPost){
+
+        foreach ($aPosts as $key => $oPost) {
             $oReturn->post[$key]->id = new stdClass();
             $oReturn->post[$key]->id = (int) $oPost->post_id;
             $oReturn->post[$key]->topicid = (int) $oPost->topic_id;
@@ -744,56 +743,96 @@ class JSON_API_BuddypressRead_Controller {
             $oReturn->post[$key]->post_position = (int) $oPost->post_position;
         }
         $oReturn->count = count($aPosts);
-        
+
         return $oReturn;
     }
-    
+
     /**
      * Returns an array containing all replies to a topic
      * @return Array replies
      */
-    public function sitewideforum_get_topic_replies(){
+    public function sitewideforum_get_topic_replies() {
         /* Possible parameters:
          * int topicid: the topicid you are searching for (if not set, topicslug is searched; topicid or topicsslug required)
          * String topicslug: the slug to search for (just used if topicid is not set; topicid or topicslug required)
          * boolean display_content: set this to true if you want the content to be displayed too (default false)
          */
         $this->initVars('forums');
-        
+
         $oReturn = new stdClass();
-        
+
         $mForumExists = $this->sitewideforum_check_topic_existence();
 
         if ($mForumExists !== true)
-            return $this->error('forum', $mForumExists );
-        foreach ($this->topicid as $iId){
+            return $this->error('forum', $mForumExists);
+        foreach ($this->topicid as $iId) {
             global $wpdb;
             $aReplies = $wpdb->get_results($wpdb->prepare(
-                    "SELECT ID, post_parent, post_author, post_title, post_date, post_modified, post_content
+                            "SELECT ID, post_parent, post_author, post_title, post_date, post_modified, post_content
                      FROM   $wpdb->posts
                      WHERE  post_type='reply'
-                     AND post_parent='".$iId."'"
+                     AND post_parent='" . $iId . "'"
                     ));
-            
-            if (empty($aReplies)){
+
+            if (empty($aReplies)) {
                 $oReturn->topics[$iId]->replies = "";
                 $oReturn->topics[$iId]->count = 0;
                 continue;
             }
-            foreach ($aReplies as $oReply){
-                $oReturn->topics[$iId]->replies[(int)$oReply->ID]['author'] = (int)$oReply->post_author;
-                $oReturn->topics[$iId]->replies[(int)$oReply->ID]['date'] = $oReply->post_date;
+            foreach ($aReplies as $oReply) {
+                $oReturn->topics[$iId]->replies[(int) $oReply->ID]['author'] = (int) $oReply->post_author;
+                $oReturn->topics[$iId]->replies[(int) $oReply->ID]['date'] = $oReply->post_date;
                 if ($this->display_content !== false)
-                    $oReturn->topics[$iId]->replies[(int)$oReply->ID]['content'] = $oReply->post_content;
-                $oReturn->topics[$iId]->replies[(int)$oReply->ID]['last_changes'] = $oReply->post_modified;
-                $oReturn->topics[$iId]->replies[(int)$oReply->ID]['title'] = $oReply->post_title;
-                $oReturn->topics[$iId]->replies[(int)$oReply->ID]['parent'] = (int) $oReply->post_parent;
+                    $oReturn->topics[$iId]->replies[(int) $oReply->ID]['content'] = $oReply->post_content;
+                $oReturn->topics[$iId]->replies[(int) $oReply->ID]['last_changes'] = $oReply->post_modified;
+                $oReturn->topics[$iId]->replies[(int) $oReply->ID]['title'] = $oReply->post_title;
+                $oReturn->topics[$iId]->replies[(int) $oReply->ID]['parent'] = (int) $oReply->post_parent;
             }
             $oReturn->topics[$iId]->count = count($aReplies);
         }
-        
+
         return $oReturn;
-    }    
+    }
+
+    public function get_settings() {
+        /* Possible parameters:
+         * String username: the username you want information from (required)
+         */
+        $this->initVars('setting');
+        $oReturn = new stdClass();
+
+        if ($this->username === false || !username_exists($this->username)) {
+            return $this->error('setting', 0);
+        }
+
+        $oUser = get_user_by('login', $this->username);
+
+        $oReturn->user->mail = $oUser->data->user_email;
+
+        $sNewMention = bp_get_user_meta($oUser->data->ID, 'notification_activity_new_mention', true);
+        $sNewReply = bp_get_user_meta($oUser->data->ID, 'notification_activity_new_reply', true);
+        $sSendRequests = bp_get_user_meta($oUser->data->ID, 'notification_friends_friendship_request', true);
+        $sAcceptRequests = bp_get_user_meta($oUser->data->ID, 'notification_friends_friendship_accepted', true);
+        $sGroupInvite = bp_get_user_meta($oUser->data->ID, 'notification_groups_invite', true);
+        $sGroupUpdate = bp_get_user_meta($oUser->data->ID, 'notification_groups_group_updated', true);
+        $sGroupPromo = bp_get_user_meta($oUser->data->ID, 'notification_groups_admin_promotion', true);
+        $sGroupRequest = bp_get_user_meta($oUser->data->ID, 'notification_groups_membership_request', true);
+        $sNewMessages = bp_get_user_meta($oUser->data->ID, 'notification_messages_new_message', true);
+        $sNewNotices = bp_get_user_meta($oUser->data->ID, 'notification_messages_new_notice', true);
+
+        $oReturn->settings['new_mention'] = $sNewMention == 'yes' ? true : false;
+        $oReturn->settings['new_reply'] = $sNewReply == 'yes' ? true : false;
+        $oReturn->settings['send_requests'] = $sSendRequests == 'yes' ? true : false;
+        $oReturn->settings['accept_requests'] = $sAcceptRequests == 'yes' ? true : false;
+        $oReturn->settings['group_invite'] = $sGroupInvite == 'yes' ? true : false;
+        $oReturn->settings['group_update'] = $sGroupUpdate == 'yes' ? true : false;
+        $oReturn->settings['group_promo'] = $sGroupPromo == 'yes' ? true : false;
+        $oReturn->settings['group_request'] = $sGroupRequest == 'yes' ? true : false;
+        $oReturn->settings['new_message'] = $sNewMessages == 'yes' ? true : false;
+        $oReturn->settings['new_notice'] = $sNewNotices == 'yes' ? true : false;
+
+        return $oReturn;
+    }
 
     /**
      * Method to handle calls for the library
