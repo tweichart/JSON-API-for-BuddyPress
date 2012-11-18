@@ -11,6 +11,10 @@ For further information refer to the GitHub Project Page at http://tweichart.git
 
 ==Release Notes==
 
+===1.0===
+* code review
+* added documentation
+
 ===0.9===
 * now checking for permissions bevore retrieving data (security)
 * need for authentication pushed to 2.0
