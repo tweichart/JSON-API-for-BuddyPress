@@ -1,0 +1,594 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+<meta charset="utf-8">
+<title>phpDocumentor » \JSON_API_BuddypressRead_Controller</title>
+<meta name="author" content="Mike van Riel">
+<meta name="description" content="">
+<link href="css/template.css" rel="stylesheet" media="all">
+<script src="js/jquery-1.7.1.min.js" type="text/javascript"></script>
+<script src="js/jquery-ui-1.8.2.custom.min.js" type="text/javascript"></script>
+<script src="js/jquery.mousewheel.min.js" type="text/javascript"></script>
+<script src="js/bootstrap.js" type="text/javascript"></script>
+<script src="js/template.js" type="text/javascript"></script>
+<script src="js/prettify/prettify.min.js" type="text/javascript"></script>
+<link rel="shortcut icon" href="img/favicon.ico">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="72x72" href="img/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="114x114" href="img/apple-touch-icon-114x114.png">
+</head>
+<body>
+<div class="navbar navbar-fixed-top">
+<div class="navbar-inner"><div class="container">
+<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand" href="index.html">phpDocumentor</a><div class="nav-collapse">
+    </div>
+</div></div>
+<div class="go_to_top"><a href="#___" style="color: inherit">Back to top  <i class="icon-upload icon-white"></i></a></div>
+</div>
+<div id="___" class="container">
+<noscript><div class="alert alert-warning">
+                            Javascript is disabled; several features are only available
+                            if Javascript is enabled.
+                        </div></noscript>
+<div class="row">
+<div class="span4">
+<div class="btn-group view pull-right" data-toggle="buttons-radio">
+<button class="btn details" title="Show descriptions and method names"><i class="icon-list"></i></button><button class="btn simple" title="Show only method names"><i class="icon-align-justify"></i></button>
+</div>
+<ul class="side-nav nav nav-list"><li class="nav-header">
+<i class="icon-custom icon-method"></i> Methods
+                    <ul>
+<li class="method public "><a href="#method_activity_get_activities" title="activity_get_activities :: Returns an Array with all activities"><span class="description">Returns an Array with all activities</span><pre>activity_get_activities()</pre></a></li>
+<li class="method public "><a href="#method_friends_get_friends" title="friends_get_friends :: Returns an array with friends for the given user"><span class="description">Returns an array with friends for the given user</span><pre>friends_get_friends()</pre></a></li>
+<li class="method public "><a href="#method_friends_get_friendship_request" title="friends_get_friendship_request :: Returns an array with friendship requests for the given user"><span class="description">Returns an array with friendship requests for the given user</span><pre>friends_get_friendship_request()</pre></a></li>
+<li class="method public "><a href="#method_friends_get_friendship_status" title="friends_get_friendship_status :: Returns a string with the status of friendship of the two users"><span class="description">Returns a string with the status of friendship of the two users</span><pre>friends_get_friendship_status()</pre></a></li>
+<li class="method public "><a href="#method_groupforum_get_forum" title="groupforum_get_forum :: Returns an array containing info about the group forum"><span class="description">Returns an array containing info about the group forum</span><pre>groupforum_get_forum()</pre></a></li>
+<li class="method public "><a href="#method_groupforum_get_forum_by_group" title="groupforum_get_forum_by_group :: Returns an array containing info about the group forum"><span class="description">Returns an array containing info about the group forum</span><pre>groupforum_get_forum_by_group()</pre></a></li>
+<li class="method public "><a href="#method_groupforum_get_forum_topics" title="groupforum_get_forum_topics :: Returns an array containing the topics from a group's forum"><span class="description">Returns an array containing the topics from a group's forum</span><pre>groupforum_get_forum_topics()</pre></a></li>
+<li class="method public "><a href="#method_groupforum_get_topic_posts" title="groupforum_get_topic_posts :: Returns an array containing the posts from a group's forum"><span class="description">Returns an array containing the posts from a group's forum</span><pre>groupforum_get_topic_posts()</pre></a></li>
+<li class="method public "><a href="#method_groups_check_user_has_invite_to_group" title="groups_check_user_has_invite_to_group :: Returns a boolean depending on an existing invite"><span class="description">Returns a boolean depending on an existing invite</span><pre>groups_check_user_has_invite_to_group()</pre></a></li>
+<li class="method public "><a href="#method_groups_check_user_membership_request_to_group" title="groups_check_user_membership_request_to_group :: Returns a boolean depending on an existing memebership request"><span class="description">Returns a boolean depending on an existing memebership request</span><pre>groups_check_user_membership_request_to_group()</pre></a></li>
+<li class="method public "><a href="#method_groups_get_group_admins" title="groups_get_group_admins :: Returns an array containing all admins for the given group"><span class="description">Returns an array containing all admins for the given group</span><pre>groups_get_group_admins()</pre></a></li>
+<li class="method public "><a href="#method_groups_get_group_members" title="groups_get_group_members :: Returns an array containing all members for the given group"><span class="description">Returns an array containing all members for the given group</span><pre>groups_get_group_members()</pre></a></li>
+<li class="method public "><a href="#method_groups_get_group_mods" title="groups_get_group_mods :: Returns an array containing all mods for the given group"><span class="description">Returns an array containing all mods for the given group</span><pre>groups_get_group_mods()</pre></a></li>
+<li class="method public "><a href="#method_groups_get_groups" title="groups_get_groups :: Returns an array with groups matching to the given parameters"><span class="description">Returns an array with groups matching to the given parameters</span><pre>groups_get_groups()</pre></a></li>
+<li class="method public "><a href="#method_messages_get_messages" title="messages_get_messages :: Returns an array with messages for the current username"><span class="description">Returns an array with messages for the current username</span><pre>messages_get_messages()</pre></a></li>
+<li class="method public "><a href="#method_notifications_get_notifications" title="notifications_get_notifications :: Returns an array with notifications for the current user"><span class="description">Returns an array with notifications for the current user</span><pre>notifications_get_notifications()</pre></a></li>
+<li class="method public "><a href="#method_profile_get_profile" title="profile_get_profile :: Returns an array with the profile's fields"><span class="description">Returns an array with the profile's fields</span><pre>profile_get_profile()</pre></a></li>
+<li class="method public "><a href="#method_settings_get_settings" title="settings_get_settings :: Returns the settings for the current user"><span class="description">Returns the settings for the current user</span><pre>settings_get_settings()</pre></a></li>
+<li class="method public "><a href="#method_sitewideforum_get_all_forums" title="sitewideforum_get_all_forums :: Returns an array containing all sitewide forums"><span class="description">Returns an array containing all sitewide forums</span><pre>sitewideforum_get_all_forums()</pre></a></li>
+<li class="method public "><a href="#method_sitewideforum_get_forum" title="sitewideforum_get_forum :: Returns an array containing info about the sitewide forum"><span class="description">Returns an array containing info about the sitewide forum</span><pre>sitewideforum_get_forum()</pre></a></li>
+<li class="method public "><a href="#method_sitewideforum_get_forum_topics" title="sitewideforum_get_forum_topics :: Returns an array containing all topics of a sitewide forum"><span class="description">Returns an array containing all topics of a sitewide forum</span><pre>sitewideforum_get_forum_topics()</pre></a></li>
+<li class="method public "><a href="#method_sitewideforum_get_topic_replies" title="sitewideforum_get_topic_replies :: Returns an array containing all replies to a topic from a sitewide forum"><span class="description">Returns an array containing all replies to a topic from a sitewide forum</span><pre>sitewideforum_get_topic_replies()</pre></a></li>
+</ul>
+</li></ul>
+</div>
+<div class="span8">
+<a id="\JSON_API_BuddypressRead_Controller"></a>
+<div class="element class">
+<p class="short_description">Controller-Class for BuddyPressRead</p>
+<div class="details">
+<div class="long_description"></div>
+<h3>
+<i class="icon-custom icon-method"></i> Methods</h3>
+
+<a id="method_activity_get_activities"></a><div class="element clickable method public method_activity_get_activities" data-toggle="collapse" data-target=".method_activity_get_activities .collapse">
+<h2>Returns an Array with all activities</h2>
+<pre>activity_get_activities() : array</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>pages</h4>
+<code>int</code><p>pages: number of pages to display (default unset)</p>
+</div>
+<div class="subelement argument">
+<h4>offset</h4>
+<code>int</code><p>offset: number of entries per page (default 10 if pages is set, otherwise unset)</p>
+</div>
+<div class="subelement argument">
+<h4>limit</h4>
+<code>int</code><p>limit: number of maximum results (default 0 for unlimited)</p>
+</div>
+<div class="subelement argument">
+<h4>sort</h4>
+<code>String</code><p>sort: sort ASC or DESC (default DESC)</p>
+</div>
+<div class="subelement argument">
+<h4>comments</h4>
+<code>String</code><p>comments: 'stream' for within stream display, 'threaded' for below each activity item (default unset)</p>
+</div>
+<div class="subelement argument">
+<h4>userid</h4>
+<code>Int</code><p>userid: userID to filter on, comma-separated for more than one ID (default unset)</p>
+</div>
+<div class="subelement argument">
+<h4>component</h4>
+<code>String</code><p>component: object to filter on e.g. groups, profile, status, friends (default unset)</p>
+</div>
+<div class="subelement argument">
+<h4>type</h4>
+<code>String</code><p>type: action to filter on e.g. activity_update, profile_updated (default unset)</p>
+</div>
+<div class="subelement argument">
+<h4>itemid</h4>
+<code>int</code><p>itemid: object ID to filter on e.g. a group_id or forum_id or blog_id etc. (default unset)</p>
+</div>
+<div class="subelement argument">
+<h4>secondaryitemid</h4>
+<code>int</code><p>secondaryitemid: secondary object ID to filter on e.g. a post_id (default unset)</p>
+</div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>array</code>activities: an array containing the activities</div>
+</div></div>
+</div>
+<a id="method_friends_get_friends"></a><div class="element clickable method public method_friends_get_friends" data-toggle="collapse" data-target=".method_friends_get_friends .collapse">
+<h2>Returns an array with friends for the given user</h2>
+<pre>friends_get_friends() : array</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>username</h4>
+<code>String</code><p>username: the username you want information from (required)</p>
+</div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>array</code>friends: array with the friends the user got</div>
+</div></div>
+</div>
+<a id="method_friends_get_friendship_request"></a><div class="element clickable method public method_friends_get_friendship_request" data-toggle="collapse" data-target=".method_friends_get_friendship_request .collapse">
+<h2>Returns an array with friendship requests for the given user</h2>
+<pre>friends_get_friendship_request() : array</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>username</h4>
+<code>String</code><p>username: the username you want information from (required)</p>
+</div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>array</code>friends: an array containing friends with some mor info</div>
+</div></div>
+</div>
+<a id="method_friends_get_friendship_status"></a><div class="element clickable method public method_friends_get_friendship_status" data-toggle="collapse" data-target=".method_friends_get_friendship_status .collapse">
+<h2>Returns a string with the status of friendship of the two users</h2>
+<pre>friends_get_friendship_status() : string</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>username</h4>
+<code>String</code><p>username: the username you want information from (required)</p>
+</div>
+<div class="subelement argument">
+<h4>friendname</h4>
+<code>String</code><p>friendname: the name of the possible friend (required)</p>
+</div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>string</code>friendshipstatus: 'is_friend', 'not_friends' or 'pending'</div>
+</div></div>
+</div>
+<a id="method_groupforum_get_forum"></a><div class="element clickable method public method_groupforum_get_forum" data-toggle="collapse" data-target=".method_groupforum_get_forum .collapse">
+<h2>Returns an array containing info about the group forum</h2>
+<pre>groupforum_get_forum() : array</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>forumid</h4>
+<code>int</code><p>forumid: the forumid you are searching for (if not set, forumslug is searched; forumid or forumslug required)</p>
+</div>
+<div class="subelement argument">
+<h4>forumslug</h4>
+<code>String</code><p>forumslug: the slug to search for (just used if forumid is not set; forumid or forumslug required)</p>
+</div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>array</code>forums: the group forum with metainfo</div>
+</div></div>
+</div>
+<a id="method_groupforum_get_forum_by_group"></a><div class="element clickable method public method_groupforum_get_forum_by_group" data-toggle="collapse" data-target=".method_groupforum_get_forum_by_group .collapse">
+<h2>Returns an array containing info about the group forum</h2>
+<pre>groupforum_get_forum_by_group() : array</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>groupid</h4>
+<code>int</code><p>groupid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)</p>
+</div>
+<div class="subelement argument">
+<h4>groupslug</h4>
+<code>String</code><p>groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)</p>
+</div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>array</code>forums: the group forum for the group</div>
+</div></div>
+</div>
+<a id="method_groupforum_get_forum_topics"></a><div class="element clickable method public method_groupforum_get_forum_topics" data-toggle="collapse" data-target=".method_groupforum_get_forum_topics .collapse">
+<h2>Returns an array containing the topics from a group's forum</h2>
+<pre>groupforum_get_forum_topics() : array</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>forumid</h4>
+<code>int</code><p>forumid: the forumid you are searching for (if not set, forumid is searched; forumid or forumslug required)</p>
+</div>
+<div class="subelement argument">
+<h4>forumslug</h4>
+<code>String</code><p>forumslug: the forumslug to search for (just used if forumid is not set; forumid or forumslug required)</p>
+</div>
+<div class="subelement argument">
+<h4>page</h4>
+<code>int</code><p>page: the page number you want to display (default 1)</p>
+</div>
+<div class="subelement argument">
+<h4>per_page</h4>
+<code>int</code><p>per_page: the number of results you want per page (default 15)</p>
+</div>
+<div class="subelement argument">
+<h4>type</h4>
+<code>String</code><p>type: newest, popular, unreplied, tag (default newest)</p>
+</div>
+<div class="subelement argument">
+<h4>taqgname</h4>
+<code>String</code><p>tagname: just used if type = tag</p>
+</div>
+<div class="subelement argument">
+<h4>detailed</h4>
+<code>boolean</code><p>detailed: true for detailed view (default false)</p>
+</div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>array</code>topics: all the group forum topics found</div>
+</div></div>
+</div>
+<a id="method_groupforum_get_topic_posts"></a><div class="element clickable method public method_groupforum_get_topic_posts" data-toggle="collapse" data-target=".method_groupforum_get_topic_posts .collapse">
+<h2>Returns an array containing the posts from a group's forum</h2>
+<pre>groupforum_get_topic_posts() : array</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>topicid</h4>
+<code>int</code><p>topicid: the topicid you are searching for (if not set, topicslug is searched; topicid or topicslug required)</p>
+</div>
+<div class="subelement argument">
+<h4>topicslug</h4>
+<code>String</code><p>topicslug: the slug to search for (just used if topicid is not set; topicid or topicslugs required)</p>
+</div>
+<div class="subelement argument">
+<h4>page</h4>
+<code>int</code><p>page: the page number you want to display (default 1)</p>
+</div>
+<div class="subelement argument">
+<h4>per_page</h4>
+<code>int</code><p>per_page: the number of results you want per page (default 15)</p>
+</div>
+<div class="subelement argument">
+<h4>order</h4>
+<code>String</code><p>order: desc for descending or asc for ascending (default asc)</p>
+</div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>array</code>posts: all the group forum posts found</div>
+</div></div>
+</div>
+<a id="method_groups_check_user_has_invite_to_group"></a><div class="element clickable method public method_groups_check_user_has_invite_to_group" data-toggle="collapse" data-target=".method_groups_check_user_has_invite_to_group .collapse">
+<h2>Returns a boolean depending on an existing invite</h2>
+<pre>groups_check_user_has_invite_to_group() : boolean</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>username</h4>
+<code>String</code><p>username: the username you want information from (required)</p>
+</div>
+<div class="subelement argument">
+<h4>groupid</h4>
+<code>int</code><p>groupid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)</p>
+</div>
+<div class="subelement argument">
+<h4>groupslug</h4>
+<code>String</code><p>groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)</p>
+</div>
+<div class="subelement argument">
+<h4>type</h4>
+<code>String</code><p>type: sent to check for sent invites, all to check for all</p></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>boolean</code>is_invited: true if invited, else false</div>
+</div></div>
+</div>
+<a id="method_groups_check_user_membership_request_to_group"></a><div class="element clickable method public method_groups_check_user_membership_request_to_group" data-toggle="collapse" data-target=".method_groups_check_user_membership_request_to_group .collapse">
+<h2>Returns a boolean depending on an existing memebership request</h2>
+<pre>groups_check_user_membership_request_to_group() : boolean</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>username</h4>
+<code>String</code><p>username: the username you want information from (required)</p>
+</div>
+<div class="subelement argument">
+<h4>groupit</h4>
+<code>int</code><p>groupid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)</p>
+</div>
+<div class="subelement argument">
+<h4>groupslug</h4>
+<code>String</code><p>groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)</p>
+</div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>boolean</code>membership_requested: true if requested, else false</div>
+</div></div>
+</div>
+<a id="method_groups_get_group_admins"></a><div class="element clickable method public method_groups_get_group_admins" data-toggle="collapse" data-target=".method_groups_get_group_admins .collapse">
+<h2>Returns an array containing all admins for the given group</h2>
+<pre>groups_get_group_admins() : array</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>groupid</h4>
+<code>int</code><p>groupid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)</p>
+</div>
+<div class="subelement argument">
+<h4>groupslug</h4>
+<code>String</code><p>groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)</p>
+</div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>array</code>group_admins: array containing the admins</div>
+</div></div>
+</div>
+<a id="method_groups_get_group_members"></a><div class="element clickable method public method_groups_get_group_members" data-toggle="collapse" data-target=".method_groups_get_group_members .collapse">
+<h2>Returns an array containing all members for the given group</h2>
+<pre>groups_get_group_members() : array</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>groupid</h4>
+<code>int</code><p>groupid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)</p>
+</div>
+<div class="subelement argument">
+<h4>groupslug</h4>
+<code>String</code><p>groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)</p>
+</div>
+<div class="subelement argument">
+<h4>limit</h4>
+<code>int</code><p>limit: maximum members displayed</p></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>array</code>group_members: group members with some more info</div>
+</div></div>
+</div>
+<a id="method_groups_get_group_mods"></a><div class="element clickable method public method_groups_get_group_mods" data-toggle="collapse" data-target=".method_groups_get_group_mods .collapse">
+<h2>Returns an array containing all mods for the given group</h2>
+<pre>groups_get_group_mods() : array</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>groupid</h4>
+<code>int</code><p>groupid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)</p>
+</div>
+<div class="subelement argument">
+<h4>groupslug</h4>
+<code>String</code><p>groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)</p>
+</div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>array</code>group_mods: array containing the mods</div>
+</div></div>
+</div>
+<a id="method_groups_get_groups"></a><div class="element clickable method public method_groups_get_groups" data-toggle="collapse" data-target=".method_groups_get_groups .collapse">
+<h2>Returns an array with groups matching to the given parameters</h2>
+<pre>groups_get_groups() : array</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>username</h4>
+<code>String</code><p>username: the username you want information from (default => all groups)</p>
+</div>
+<div class="subelement argument">
+<h4>show_hidden</h4>
+<code>Boolean</code><p>show_hidden: Show hidden groups to non-admins (default: false)</p>
+</div>
+<div class="subelement argument">
+<h4>type</h4>
+<code>String</code><p>type: active, newest, alphabetical, random, popular, most-forum-topics or most-forum-posts (default active)</p>
+</div>
+<div class="subelement argument">
+<h4>page</h4>
+<code>int</code><p>page: The page to return if limiting per page (default 1)</p>
+</div>
+<div class="subelement argument">
+<h4>per_page</h4>
+<code>int</code><p>per_page: The number of results to return per page (default 20)</p>
+</div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>array</code>groups: array with meta infos</div>
+</div></div>
+</div>
+<a id="method_messages_get_messages"></a><div class="element clickable method public method_messages_get_messages" data-toggle="collapse" data-target=".method_messages_get_messages .collapse">
+<h2>Returns an array with messages for the current username</h2>
+<pre>messages_get_messages() : array</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>box</h4>
+<code>String</code><p>box: the box you the messages are in (possible values are 'inbox', 'sentbox', 'notices', default is 'inbox')</p>
+</div>
+<div class="subelement argument">
+<h4>per_page</h4>
+<code>int</code><p>per_page: items to be displayed per page (default 10)</p>
+</div>
+<div class="subelement argument">
+<h4>limit</h4>
+<code>boolean</code><p>limit: maximum numbers of emtries (default no limit)</p>
+</div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>array</code>messages: contains the messages</div>
+</div></div>
+</div>
+<a id="method_notifications_get_notifications"></a><div class="element clickable method public method_notifications_get_notifications" data-toggle="collapse" data-target=".method_notifications_get_notifications .collapse">
+<h2>Returns an array with notifications for the current user</h2>
+<pre>notifications_get_notifications() : array</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>array</code>notifications: the notifications as a link</div>
+</div></div>
+</div>
+<a id="method_profile_get_profile"></a><div class="element clickable method public method_profile_get_profile" data-toggle="collapse" data-target=".method_profile_get_profile .collapse">
+<h2>Returns an array with the profile's fields</h2>
+<pre>profile_get_profile() : array</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>username</h4>
+<code>String</code><p>username: the username you want information from (required)</p>
+</div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>array</code>profilefields: an array containing the profilefields</div>
+</div></div>
+</div>
+<a id="method_settings_get_settings"></a><div class="element clickable method public method_settings_get_settings" data-toggle="collapse" data-target=".method_settings_get_settings .collapse">
+<h2>Returns the settings for the current user</h2>
+<pre>settings_get_settings() : object</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>object</code>settings: an object full of the settings</div>
+</div></div>
+</div>
+<a id="method_sitewideforum_get_all_forums"></a><div class="element clickable method public method_sitewideforum_get_all_forums" data-toggle="collapse" data-target=".method_sitewideforum_get_all_forums .collapse">
+<h2>Returns an array containing all sitewide forums</h2>
+<pre>sitewideforum_get_all_forums() : array</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>parentid</h4>
+<code>int</code><p>parentid: all children of the given id (default 0 = all)</p>
+</div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>array</code>forums: all sitewide forums</div>
+</div></div>
+</div>
+<a id="method_sitewideforum_get_forum"></a><div class="element clickable method public method_sitewideforum_get_forum" data-toggle="collapse" data-target=".method_sitewideforum_get_forum .collapse">
+<h2>Returns an array containing info about the sitewide forum</h2>
+<pre>sitewideforum_get_forum() : array</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>forumid</h4>
+<code>int</code><p>forumid: the forumid you are searching for (if not set, forumslug is searched; forumid or forumslug required)</p>
+</div>
+<div class="subelement argument">
+<h4>forumslug</h4>
+<code>String</code><p>forumslug: the slug to search for (just used if forumid is not set; forumid or forumslug required)</p>
+</div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>array</code>forums: sitewide forum with some infos</div>
+</div></div>
+</div>
+<a id="method_sitewideforum_get_forum_topics"></a><div class="element clickable method public method_sitewideforum_get_forum_topics" data-toggle="collapse" data-target=".method_sitewideforum_get_forum_topics .collapse">
+<h2>Returns an array containing all topics of a sitewide forum</h2>
+<pre>sitewideforum_get_forum_topics() : array</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>forumid</h4>
+<code>int</code><p>forumid: the forumid you are searching for (if not set, forumslug is searched; forumid or forumslug required)</p>
+</div>
+<div class="subelement argument">
+<h4>forumslug</h4>
+<code>String</code><p>forumslug: the slug to search for (just used if forumid is not set; forumid or forumslug required)</p>
+</div>
+<div class="subelement argument">
+<h4>display_content</h4>
+<code>boolean</code><p>display_content: set this to true if you want the content to be displayed too (default false)</p>
+</div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>array</code>forums->topics: array of sitewide forums with the topics in it</div>
+</div></div>
+</div>
+<a id="method_sitewideforum_get_topic_replies"></a><div class="element clickable method public method_sitewideforum_get_topic_replies" data-toggle="collapse" data-target=".method_sitewideforum_get_topic_replies .collapse">
+<h2>Returns an array containing all replies to a topic from a sitewide forum</h2>
+<pre>sitewideforum_get_topic_replies() : array</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>topicid</h4>
+<code>int</code><p>topicid: the topicid you are searching for (if not set, topicslug is searched; topicid or topicsslug required)</p>
+</div>
+<div class="subelement argument">
+<h4>topicslug</h4>
+<code>String</code><p>topicslug: the slug to search for (just used if topicid is not set; topicid or topicslug required)</p>
+</div>
+<div class="subelement argument">
+<h4>display_content</h4>
+<code>boolean</code><p>display_content: set this to true if you want the content to be displayed too (default false)</p>
+</div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>array</code>topics->replies: an array containing the replies</div>
+</div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="row"><footer class="span12">
+            Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
+            Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.0.0a11</a> and<br>
+            generated on 2012-11-18T11:12:00+01:00.<br></footer></div>
+</div>
+</body>
+</html>
