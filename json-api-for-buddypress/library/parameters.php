@@ -74,7 +74,8 @@ $aParams = array(
             'parentid' => false
         ),
         'boolean' => array(
-            'display_content' => false
+            'display_content' => false,
+            'detailed' => false
         )
     ),
     'settings' => array(

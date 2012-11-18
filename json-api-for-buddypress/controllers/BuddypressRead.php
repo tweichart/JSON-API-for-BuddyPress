@@ -9,25 +9,21 @@ require_once JSON_API_FOR_BUDDYPRESS_HOME . '/library/functions.class.php';
 
 class JSON_API_BuddypressRead_Controller {
 
-    //tbd: check results for type
     /**
-     * Returns an object with all activities
-     * @return Object Activities
+     * Returns an Array with all activities
+     * @param int pages: number of pages to display (default unset)
+     * @param int offset: number of entries per page (default 10 if pages is set, otherwise unset)
+     * @param int limit: number of maximum results (default 0 for unlimited)
+     * @param String sort: sort ASC or DESC (default DESC)
+     * @param String comments: 'stream' for within stream display, 'threaded' for below each activity item (default unset)
+     * @param Int userid: userID to filter on, comma-separated for more than one ID (default unset)
+     * @param String component: object to filter on e.g. groups, profile, status, friends (default unset)
+     * @param String type: action to filter on e.g. activity_update, profile_updated (default unset)
+     * @param int itemid: object ID to filter on e.g. a group_id or forum_id or blog_id etc. (default unset)
+     * @param int secondaryitemid: secondary object ID to filter on e.g. a post_id (default unset)
+     * @return array activities: an array containing the activities
      */
-    public function get_activities() {
-        /* Possible parameters:
-         * int pages: number of pages to display (default unset)
-         * int offset: number of entries per page (default 10 if pages is set, otherwise unset)
-         * int limit: number of maximum results (default 0 for unlimited)
-         * String sort: sort ASC or DESC (default DESC)
-         * String comments: 'stream' for within stream display, 'threaded' for below each activity item (default unset)
-         * Int userid: userID to filter on, comma-separated for more than one ID (default unset)
-         * String component: object to filter on e.g. groups, profile, status, friends (default unset)
-         * String type: action to filter on e.g. activity_update, profile_updated (default unset)
-         * int itemid: object ID to filter on e.g. a group_id or forum_id or blog_id etc. (default unset)
-         * int secondaryitemid: secondary object ID to filter on e.g. a post_id (default unset)
-         */
-
+    public function activity_get_activities() {
         $oReturn = new stdClass();
         $this->init('activity', 'see_activity');
 
@@ -54,8 +50,20 @@ class JSON_API_BuddypressRead_Controller {
             if ($iLimit != 0)
                 $aParams['per_page'] = $iLimit;
             $aTempActivities = bp_activity_get($aParams);
+
+
             if (!empty($aTempActivities['activities'])) {
-                $oReturn->activities [0] = $aTempActivities['activities'];
+                foreach ($aTempActivities['activities'] as $oActivity) {
+                    $oReturn->activities[(int) $oActivity->id]->component = $oActivity->component;
+                    $oReturn->activities[(int) $oActivity->id]->user[(int) $oActivity->user_id]->username = $oActivity->user_login;
+                    $oReturn->activities[(int) $oActivity->id]->user[(int) $oActivity->user_id]->mail = $oActivity->user_email;
+                    $oReturn->activities[(int) $oActivity->id]->user[(int) $oActivity->user_id]->display_name = $oActivity->display_name;
+                    $oReturn->activities[(int) $oActivity->id]->type = $oActivity->type;
+                    $oReturn->activities[(int) $oActivity->id]->time = $oActivity->date_recorded;
+                    $oReturn->activities[(int) $oActivity->id]->is_hidden = $oActivity->hide_sitewide === "0" ? false : true;
+                    $oReturn->activities[(int) $oActivity->id]->is_spam = $oActivity->is_spam === "0" ? false : true;
+                }
+                $oReturn->count = count($aTempActivities['activities']);
             } else {
                 return $this->error('activity');
             }
@@ -76,7 +84,17 @@ class JSON_API_BuddypressRead_Controller {
                     break;
             }
             else {
-                $oReturn->activities [$i] = $aTempActivities['activities'];
+                foreach ($aTempActivities['activities'] as $oActivity) {
+                    $oReturn->activities[(int) $oActivity->id]->component = $oActivity->component;
+                    $oReturn->activities[(int) $oActivity->id]->user[(int) $oActivity->user_id]->username = $oActivity->user_login;
+                    $oReturn->activities[(int) $oActivity->id]->user[(int) $oActivity->user_id]->mail = $oActivity->user_email;
+                    $oReturn->activities[(int) $oActivity->id]->user[(int) $oActivity->user_id]->display_name = $oActivity->display_name;
+                    $oReturn->activities[(int) $oActivity->id]->type = $oActivity->type;
+                    $oReturn->activities[(int) $oActivity->id]->time = $oActivity->date_recorded;
+                    $oReturn->activities[(int) $oActivity->id]->is_hidden = $oActivity->hide_sitewide === "0" ? false : true;
+                    $oReturn->activities[(int) $oActivity->id]->is_spam = $oActivity->is_spam === "0" ? false : true;
+                }
+                $oReturn->count = count($aTempActivities['activities']);
                 if ($bLastRun)
                     break;
             }
@@ -86,13 +104,11 @@ class JSON_API_BuddypressRead_Controller {
     }
 
     /**
-     * Returns an object with profile information
-     * @return Object Profile Fields
+     * Returns an array with the profile's fields
+     * @param String username: the username you want information from (required)
+     * @return array profilefields: an array containing the profilefields
      */
-    public function get_profile() {
-        /* Possible parameters:
-         * String username: the username you want information from (required)
-         */
+    public function profile_get_profile() {
         $this->init('xprofile');
         $oReturn = new stdClass();
 
@@ -116,7 +132,7 @@ class JSON_API_BuddypressRead_Controller {
                     if (bp_field_has_data()) {
                         $sFieldValue = bp_get_the_profile_field_value();
                     }
-                    $oReturn->groups->$sGroupName->$sFieldName = $sFieldValue;
+                    $oReturn->profilefields->$sGroupName->$sFieldName = $sFieldValue;
                 }
             }
         }
@@ -124,15 +140,13 @@ class JSON_API_BuddypressRead_Controller {
     }
 
     /**
-     * Returns an object with messages for the current user
-     * @return Object Messages
+     * Returns an array with messages for the current username
+     * @param String box: the box you the messages are in (possible values are 'inbox', 'sentbox', 'notices', default is 'inbox')
+     * @param int per_page: items to be displayed per page (default 10)
+     * @param boolean limit: maximum numbers of emtries (default no limit)
+     * @return array messages: contains the messages
      */
-    public function get_messages() {
-        /* Possible parameters:
-         * String box: the box you the messages are in (possible values are 'inbox', 'sentbox', 'notices', default is 'inbox')
-         * int per_page: items to be displayed per page (default 10)
-         * boolean limit: maximum numbers of emtries (default no limit)
-         */
+    public function messages_get_messages() {
         $this->init('messages');
         $oReturn = new stdClass();
 
@@ -144,15 +158,21 @@ class JSON_API_BuddypressRead_Controller {
             while (bp_message_threads()) {
                 bp_message_thread();
                 $aTemp = new stdClass();
-
-                $aTemp->id = bp_get_message_thread_id();
-                $aTemp->from = bp_get_message_thread_from();
-                $aTemp->to = bp_get_message_thread_to();
+                preg_match("#>(.*?)<#", bp_get_message_thread_from(), $aFrom);
+                $oUser = get_user_by('login', $aFrom[1]);
+                $aTemp->from[(int) $oUser->data->ID]->username = $aFrom[1];
+                $aTemp->from[(int) $oUser->data->ID]->mail = $oUser->data->user_email;
+                $aTemp->from[(int) $oUser->data->ID]->display_name = $oUser->data->display_name;
+                preg_match("#>(.*?)<#", bp_get_message_thread_to(), $aTo);
+                $oUser = get_user_by('login', $aTo[1]);
+                $aTemp->to[(int) $oUser->data->ID]->username = $aTo[1];
+                $aTemp->to[(int) $oUser->data->ID]->mail = $oUser->data->user_email;
+                $aTemp->to[(int) $oUser->data->ID]->display_name = $oUser->data->display_name;
                 $aTemp->subject = bp_get_message_thread_subject();
                 $aTemp->excerpt = bp_get_message_thread_excerpt();
                 $aTemp->link = bp_get_message_thread_view_link();
 
-                $oReturn->messages [] = $aTemp;
+                $oReturn->messages [(int) bp_get_message_thread_id()] = $aTemp;
             }
         } else {
             return $this->error('messages');
@@ -161,13 +181,11 @@ class JSON_API_BuddypressRead_Controller {
     }
 
     /**
-     * Returns an object with notifications for the current user
-     * @return Object Notifications
+     * Returns an array with notifications for the current user
+     * @param none there are no parameters to be used
+     * @return array notifications: the notifications as a link
      */
-    public function get_notifications() {
-        /* Possible parameters:
-         * none
-         */
+    public function notifications_get_notifications() {
         $this->init('notifications');
         $oReturn = new stdClass();
 
@@ -186,13 +204,11 @@ class JSON_API_BuddypressRead_Controller {
     }
 
     /**
-     * Returns an object with friends for the given user
-     * @return Object Friends
+     * Returns an array with friends for the given user
+     * @param String username: the username you want information from (required)
+     * @return array friends: array with the friends the user got
      */
-    public function get_friends() {
-        /* Possible parameters:
-         * String username: the username you want information from (required)
-         */
+    public function friends_get_friends() {
         $this->init('friends');
         $oReturn = new stdClass();
 
@@ -207,20 +223,21 @@ class JSON_API_BuddypressRead_Controller {
         if ($aFriends[0] == "")
             return $this->error('friends', 1);
         foreach ($aFriends as $sFriendID) {
-            $oReturn->friends [] = (int) $sFriendID;
+            $oUser = get_user_by('id', $sFriendID);
+            $oReturn->friends [(int) $sFriendID]->username = $oUser->data->user_login;
+            $oReturn->friends [(int) $sFriendID]->display_name = $oUser->data->display_name;
+            $oReturn->friends [(int) $sFriendID]->mail = $oUser->data->user_email;
         }
-        $oReturn->count = count($oReturn->friends);
+        $oReturn->count = count($aFriends);
         return $oReturn;
     }
 
     /**
-     * Returns an object with friendship requests for the given user
-     * @return Object Friends
+     * Returns an array with friendship requests for the given user
+     * @params String username: the username you want information from (required)
+     * @return array friends: an array containing friends with some mor info
      */
-    public function get_friendship_request() {
-        /* Possible parameters:
-         * String username: the username you want information from (required)
-         */
+    public function friends_get_friendship_request() {
         $this->init('friends');
         $oReturn = new stdClass();
 
@@ -238,21 +255,22 @@ class JSON_API_BuddypressRead_Controller {
         if ($aFriends[0] == "0")
             return $this->error('friends', 2);
         foreach ($aFriends as $sFriendID) {
-            $oReturn->friends [] = (int) $sFriendID;
+            $oUser = get_user_by('id', $sFriendID);
+            $oReturn->friends [(int) $sFriendID]->username = $oUser->data->user_login;
+            $oReturn->friends [(int) $sFriendID]->display_name = $oUser->data->display_name;
+            $oReturn->friends [(int) $sFriendID]->mail = $oUser->data->user_email;
         }
         $oReturn->count = count($oReturn->friends);
         return $oReturn;
     }
 
     /**
-     * Returns an object with the status of friendship of the two users
-     * @return Object Friends
+     * Returns a string with the status of friendship of the two users
+     * @param String username: the username you want information from (required)
+     * @param String friendname: the name of the possible friend (required)
+     * @return string friendshipstatus: 'is_friend', 'not_friends' or 'pending'
      */
-    public function get_friendship_status() {
-        /* Possible parameters:
-         * String username: the username you want information from (required)
-         * String friendname: the name of the possible friend (required)
-         */
+    public function friends_get_friendship_status() {
         $this->init('friends');
         $oReturn = new stdClass();
 
@@ -264,9 +282,6 @@ class JSON_API_BuddypressRead_Controller {
             return $this->error('friends', 3);
         }
 
-        if (!is_user_logged_in() || get_current_user_id() != $oUser->data->ID)
-            return $this->error('base', 0);
-
         $oUser = get_user_by('login', $this->username);
         $oUserFriend = get_user_by('login', $this->friendname);
 
@@ -274,20 +289,16 @@ class JSON_API_BuddypressRead_Controller {
         return $oReturn;
     }
 
-    //tbd: slug check
-
     /**
-     * Returns an object with groups matching to the given parameters
-     * @return Object Groups
+     * Returns an array with groups matching to the given parameters
+     * @param String username: the username you want information from (default => all groups)
+     * @param Boolean show_hidden: Show hidden groups to non-admins (default: false)
+     * @param String type: active, newest, alphabetical, random, popular, most-forum-topics or most-forum-posts (default active)
+     * @param int page: The page to return if limiting per page (default 1)
+     * @param int per_page: The number of results to return per page (default 20)
+     * @return array groups: array with meta infos
      */
-    public function get_groups() {
-        /* Possible parameters:
-         * String username: the username you want information from (default => all groups)
-         * Boolean show_hidden: Show hidden groups to non-admins (default: false)
-         * String type: active, newest, alphabetical, random, popular, most-forum-topics or most-forum-posts (default active)
-         * int page: The page to return if limiting per page (default 1)
-         * int per_page: The number of results to return per page (default 20)
-         */
+    public function groups_get_groups() {
         $this->init('groups');
         $oReturn = new stdClass();
 
@@ -312,29 +323,30 @@ class JSON_API_BuddypressRead_Controller {
             $oReturn->groups[(int) $aGroup->id]->status = $aGroup->status;
             if ($aGroup->status == "private" && !is_user_logged_in() && !$aGroup->is_member === true)
                 continue;
-            $oReturn->groups[(int) $aGroup->id]->creator = (int) $aGroup->creator_id;
+            $oUser = get_user_by('id', $aGroup->creator_id);
+            $oReturn->groups[(int) $aGroup->id]->creator[(int) $aGroup->creator_id]->username = $oUser->data->user_login;
+            $oReturn->groups[(int) $aGroup->id]->creator[(int) $aGroup->creator_id]->mail = $oUser->data->user_email;
+            $oReturn->groups[(int) $aGroup->id]->creator[(int) $aGroup->creator_id]->display_name = $oUser->data->display_name;
             $oReturn->groups[(int) $aGroup->id]->slug = $aGroup->slug;
             $oReturn->groups[(int) $aGroup->id]->is_forum_enabled = $aGroup->enable_forum == "1" ? true : false;
             $oReturn->groups[(int) $aGroup->id]->date_created = $aGroup->date_created;
             $oReturn->groups[(int) $aGroup->id]->count_member = $aGroup->total_member_count;
         }
 
-        $oReturn->count = (int) $aGroups['total'];
+        $oReturn->count = count($aGroups['groups']);
 
         return $oReturn;
     }
 
     /**
-     * Returns a boolean with the result of the match
-     * @return boolean is_invited
+     * Returns a boolean depending on an existing invite
+     * @param String username: the username you want information from (required)
+     * @param int groupid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)
+     * @param String groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)
+     * @param String type: sent to check for sent invites, all to check for all
+     * @return boolean is_invited: true if invited, else false
      */
-    public function check_user_has_invite_to_group() {
-        /* Possible parameters:
-         * String username: the username you want information from (required)
-         * int groupid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)
-         * String groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)
-         * String type: sent to check for sent invites, all to check for all
-         */
+    public function groups_check_user_has_invite_to_group() {
         $this->init('groups');
 
         $oReturn = new stdClass();
@@ -359,15 +371,13 @@ class JSON_API_BuddypressRead_Controller {
     }
 
     /**
-     * Returns a boolean with the result of the match
-     * @return boolean membership_requested
+     * Returns a boolean depending on an existing memebership request
+     * @param String username: the username you want information from (required)
+     * @param int groupid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)
+     * @param String groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)
+     * @return boolean membership_requested: true if requested, else false
      */
-    public function check_user_membership_request_to_group() {
-        /* Possible parameters:
-         * String username: the username you want information from (required)
-         * int groupid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)
-         * String groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)
-         */
+    public function groups_check_user_membership_request_to_group() {
         $this->init('groups');
 
         $oReturn = new stdClass();
@@ -390,13 +400,11 @@ class JSON_API_BuddypressRead_Controller {
 
     /**
      * Returns an array containing all admins for the given group
-     * @return Array group_admins
+     * @param int groupid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)
+     * @param String groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)
+     * @return array group_admins: array containing the admins
      */
-    public function get_group_admins() {
-        /* Possible parameters:
-         * int groupid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)
-         * String groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)
-         */
+    public function groups_get_group_admins() {
         $this->init('groups');
 
         $oReturn = new stdClass();
@@ -410,20 +418,22 @@ class JSON_API_BuddypressRead_Controller {
 
         $aGroupAdmins = groups_get_group_admins($this->groupid);
         foreach ($aGroupAdmins as $oGroupAdmin) {
-            $oReturn->group_admins[(int) $oGroupAdmin->user_id] = get_user_by('id', $oGroupAdmin->user_id)->data->user_login;
+            $oUser = get_user_by('id', $oGroupAdmin->user_id);
+            $oReturn->group_admins[(int) $oGroupAdmin->user_id]->username = $oUser->data->user_login;
+            $oReturn->group_admins[(int) $oGroupAdmin->user_id]->mail = $oUser->data->user_email;
+            $oReturn->group_admins[(int) $oGroupAdmin->user_id]->display_name = $oUser->data->display_name;
         }
+        $oReturn->count = count($aGroupAdmins);
         return $oReturn;
     }
 
     /**
      * Returns an array containing all mods for the given group
-     * @return Array group_mods
+     * @params int groupid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)
+     * @params String groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)
+     * @return array group_mods: array containing the mods
      */
-    public function get_group_mods() {
-        /* Possible parameters:
-         * int groupid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)
-         * String groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)
-         */
+    public function groups_get_group_mods() {
         $this->init('groups');
 
         $oReturn = new stdClass();
@@ -438,21 +448,22 @@ class JSON_API_BuddypressRead_Controller {
         $oReturn->group_mods = groups_get_group_mods($this->groupid);
         $aGroupMods = groups_get_group_mods($this->groupid);
         foreach ($aGroupMods as $aGroupMod) {
-            $oReturn->group_mods[(int) $aGroupMod->user_id] = get_user_by('id', $aGroupMod->user_id)->data->user_login;
+            $oUser = get_user_by('id', $aGroupMod->user_id);
+            $oReturn->group_mods[(int) $aGroupMod->user_id]->username = $oUser->data->user_login;
+            $oReturn->group_mods[(int) $aGroupMod->user_id]->mail = $oUser->data->user_email;
+            $oReturn->group_mods[(int) $aGroupMod->user_id]->display_name = $oUser->data->display_name;
         }
         return $oReturn;
     }
 
     /**
      * Returns an array containing all members for the given group
-     * @return Array group_members
+     * @params int groupid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)
+     * @params String groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)
+     * @params int limit: maximum members displayed
+     * @return array group_members: group members with some more info
      */
-    public function get_group_members() {
-        /* Possible parameters:
-         * int groupid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)
-         * String groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)
-         * int limit: maximum members displayed
-         */
+    public function groups_get_group_members() {
         $this->init('groups');
 
         $oReturn = new stdClass();
@@ -472,7 +483,9 @@ class JSON_API_BuddypressRead_Controller {
         }
 
         foreach ($aMembers['members'] as $aMember) {
-            $oReturn->group_members[] = $aMember;
+            $oReturn->group_members[(int) $aMember->user_id]->username = $aMember->user_login;
+            $oReturn->group_members[(int) $aMember->user_id]->mail = $aMember->user_email;
+            $oReturn->group_members[(int) $aMember->user_id]->display_name = $aMember->display_name;
         }
         $oReturn->count = $aMembers['count'];
 
@@ -480,14 +493,12 @@ class JSON_API_BuddypressRead_Controller {
     }
 
     /**
-     * Returns an object containing info about the forum
-     * @return Object Forum
+     * Returns an array containing info about the group forum
+     * @param int forumid: the forumid you are searching for (if not set, forumslug is searched; forumid or forumslug required)
+     * @param String forumslug: the slug to search for (just used if forumid is not set; forumid or forumslug required)
+     * @return array forums: the group forum with metainfo
      */
     public function groupforum_get_forum() {
-        /* Possible parameters:
-         * int forumid: the forumid you are searching for (if not set, forumslug is searched; forumid or forumslug required)
-         * String forumslug: the slug to search for (just used if forumid is not set; forumid or forumslug required)
-         */
         $this->init('forums');
 
         $oReturn = new stdClass();
@@ -501,93 +512,21 @@ class JSON_API_BuddypressRead_Controller {
 
         $oForum = bp_forums_get_forum((int) $this->forumid);
 
-        $oReturn->forum->id = (int) $oForum->forum_id;
-        $oReturn->forum->name = $oForum->forum_name;
-        $oReturn->forum->slug = $oForum->forum_slug;
-        $oReturn->forum->description = $oForum->forum_desc;
-        $oReturn->forum->topics_count = (int) $oForum->topics;
-        $oReturn->forum->post_count = (int) $oForum->posts;
+        $oReturn->forums[(int) $oForum->forum_id]->name = $oForum->forum_name;
+        $oReturn->forums[(int) $oForum->forum_id]->slug = $oForum->forum_slug;
+        $oReturn->forums[(int) $oForum->forum_id]->description = $oForum->forum_desc;
+        $oReturn->forums[(int) $oForum->forum_id]->topics_count = (int) $oForum->topics;
+        $oReturn->forums[(int) $oForum->forum_id]->post_count = (int) $oForum->posts;
         return $oReturn;
     }
 
     /**
-     * Returns an object containing info about the forum
-     * @return Object Forum
-     */
-    public function sitewideforum_get_forum() {
-        /* Possible parameters:
-         * int forumid: the forumid you are searching for (if not set, forumslug is searched; forumid or forumslug required)
-         * String forumslug: the slug to search for (just used if forumid is not set; forumid or forumslug required)
-         */
-        $this->init('forums');
-
-        $oReturn = new stdClass();
-
-        $mForumExists = $this->sitewideforum_check_forum_existence();
-
-        if ($mForumExists !== true)
-            return $this->error('forums', $mForumExists);
-        foreach ($this->forumid as $iId) {
-            $oForum = bbp_get_forum((int) $iId);
-            $oReturn->forum[$iId]->id = (int) $oForum->ID;
-            $oReturn->forum[$iId]->title = $oForum->post_title;
-            $oReturn->forum[$iId]->name = $oForum->post_name;
-            $oReturn->forum[$iId]->author = $oForum->post_author;
-            $oReturn->forum[$iId]->date = $oForum->post_date;
-            $oReturn->forum[$iId]->last_change = $oForum->post_modified;
-            $oReturn->forum[$iId]->status = $oForum->post_status;
-            $oReturn->forum[$iId]->name = $oForum->post_name;
-            $iTopicCount = bbp_get_forum_topic_count((int) $this->forumid);
-            $oReturn->forum[$iId]->topics_count = is_null($iTopicCount) ? 0 : $iTopicCount;
-            $iPostCount = bbp_get_forum_post_count((int) $this->forumid);
-            $oReturn->forum[$iId]->post_count = is_null($iPostCount) ? 0 : $iPostCount;
-        }
-
-        return $oReturn;
-    }
-
-    /**
-     * Returns an object containing all forums
-     * @return Object Forums
-     */
-    public function sitewideforum_get_all_forums() {
-        /* Possible parameters:
-         * int parentid: all children of the given id (default 0 = all)
-         */
-        $this->init('forums');
-
-        $oReturn = new stdClass();
-        global $wpdb;
-        $sParentQuery = $this->parentid === false ? "" : " AND post_parent=" . (int) $this->parentid;
-        $aForums = $wpdb->get_results($wpdb->prepare(
-                        "SELECT ID, post_parent, post_author, post_title, post_date, post_modified
-                 FROM   $wpdb->posts
-                 WHERE  post_type='forum'" . $sParentQuery
-                ));
-
-        if (empty($aForums))
-            return $this->error('forums', 9);
-
-        foreach ($aForums as $aForum) {
-            $iId = (int) $aForum->ID;
-            $oReturn->forums[$iId]['author'] = (int) $aForum->post_author;
-            $oReturn->forums[$iId]['date'] = $aForum->post_date;
-            $oReturn->forums[$iId]['last_changes'] = $aForum->post_modified;
-            $oReturn->forums[$iId]['title'] = $aForum->post_title;
-            $oReturn->forums[$iId]['parent'] = (int) $aForum->post_parent;
-        }
-        return $oReturn;
-    }
-
-    /**
-     * Returns an object containing info about the forum
-     * @return Object Forum
+     * Returns an array containing info about the group forum
+     * @param int groupid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)
+     * @param String groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)
+     * @return array forums: the group forum for the group
      */
     public function groupforum_get_forum_by_group() {
-        /* Possible parameters:
-         * int groupid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)
-         * String groupslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)
-         */
         $this->init('forums');
 
         $oReturn = new stdClass();
@@ -607,28 +546,26 @@ class JSON_API_BuddypressRead_Controller {
             return $this->error('forums', 1);
         $oForum = bp_forums_get_forum((int) $iForumId);
 
-        $oReturn->forum->id = (int) $oForum->forum_id;
-        $oReturn->forum->name = $oForum->forum_name;
-        $oReturn->forum->slug = $oForum->forum_slug;
-        $oReturn->forum->description = $oForum->forum_desc;
-        $oReturn->forum->topics_count = (int) $oForum->topics;
-        $oReturn->forum->post_count = (int) $oForum->posts;
+        $oReturn->forums[(int) $oForum->forum_id]->name = $oForum->forum_name;
+        $oReturn->forums[(int) $oForum->forum_id]->slug = $oForum->forum_slug;
+        $oReturn->forums[(int) $oForum->forum_id]->description = $oForum->forum_desc;
+        $oReturn->forums[(int) $oForum->forum_id]->topics_count = (int) $oForum->topics;
+        $oReturn->forums[(int) $oForum->forum_id]->post_count = (int) $oForum->posts;
         return $oReturn;
     }
 
     /**
-     * Returns an array containing the topics
-     * @return Array topics
+     * Returns an array containing the topics from a group's forum
+     * @param int forumid: the forumid you are searching for (if not set, forumid is searched; forumid or forumslug required)
+     * @param String forumslug: the forumslug to search for (just used if forumid is not set; forumid or forumslug required)
+     * @param int page: the page number you want to display (default 1)
+     * @param int per_page: the number of results you want per page (default 15)
+     * @param String type: newest, popular, unreplied, tag (default newest)
+     * @param String tagname: just used if type = tag
+     * @param boolean detailed: true for detailed view (default false)
+     * @return array topics: all the group forum topics found
      */
     public function groupforum_get_forum_topics() {
-        /* Possible parameters:
-         * int forumid: the groupid you are searching for (if not set, groupslug is searched; groupid or groupslug required)
-         * String forumslug: the slug to search for (just used if groupid is not set; groupid or groupslug required)
-         * int page: the page number you want to display (default 1)
-         * int per_page: the number of results you want per page (default 15)
-         * String type: newest, popular, unreplied, tag (default newest)
-         * String tagname: just used if type = tag
-         */
         $this->init('forums');
 
         $oReturn = new stdClass();
@@ -650,27 +587,153 @@ class JSON_API_BuddypressRead_Controller {
         $aTopics = bp_forums_get_forum_topics($aConfig);
         if (is_null($aTopics))
             $this->error('forums', 7);
-        foreach ($aTopics as $key => $aTopic) {
-            $oReturn->topics[$key]->id = (int) $aTopic->topic_id;
-            $oReturn->topics[$key]->title = $aTopic->topic_title;
-            $oReturn->topics[$key]->slug = $aTopic->topic_slug;
-            $oReturn->topics[$key]->poster = $aTopic->topic_poster;
-            $oReturn->topics[$key]->post_count = $aTopic->topic_posts;
+        foreach ($aTopics as $aTopic) {
+            $oReturn->topics[(int) $aTopic->topic_id]->title = $aTopic->topic_title;
+            $oReturn->topics[(int) $aTopic->topic_id]->slug = $aTopic->topic_slug;
+            $oUser = get_user_by('id', $aTopic->topic_poster);
+            $oReturn->topics[(int) $aTopic->topic_id]->poster[(int) $oUser->data->ID]->username = $oUser->data->user_login;
+            $oReturn->topics[(int) $aTopic->topic_id]->poster[(int) $oUser->data->ID]->mail = $oUser->data->user_email;
+            $oReturn->topics[(int) $aTopic->topic_id]->poster[(int) $oUser->data->ID]->display_name = $oUser->data->display_name;
+            $oReturn->topics[(int) $aTopic->topic_id]->post_count = (int) $aTopic->topic_posts;
+            if ($this->detailed === true) {
+                $oTopic = bp_forums_get_topic_details($aTopic->topic_id);
+
+                $oUser = get_user_by('id', $oTopic->topic_last_poster);
+                $oReturn->topics[(int) $aTopic->topic_id]->last_poster[(int) $oTopic->topic_last_poster]->username = $oUser->data->user_login;
+                $oReturn->topics[(int) $aTopic->topic_id]->last_poster[(int) $oTopic->topic_last_poster]->mail = $oUser->data->user_email;
+                $oReturn->topics[(int) $aTopic->topic_id]->last_poster[(int) $oTopic->topic_last_poster]->display_name = $oUser->data->display_name;
+                $oReturn->topics[(int) $aTopic->topic_id]->start_time = $oTopic->topic_start_time;
+                $oReturn->topics[(int) $aTopic->topic_id]->forum_id = (int) $oTopic->forum_id;
+                $oReturn->topics[(int) $aTopic->topic_id]->topic_status = $oTopic->topic_status;
+                $oReturn->topics[(int) $aTopic->topic_id]->is_open = (int) $oTopic->topic_open === 1 ? true : false;
+                $oReturn->topics[(int) $aTopic->topic_id]->is_sticky = (int) $oTopic->topic_sticky === 1 ? true : false;
+            }
         }
         $oReturn->count = count($aTopics);
         return $oReturn;
     }
 
     /**
-     * Returns an array containing all topics of a forum
-     * @return Array Topics
+     * Returns an array containing the posts from a group's forum
+     * @param int topicid: the topicid you are searching for (if not set, topicslug is searched; topicid or topicslug required)
+     * @param String topicslug: the slug to search for (just used if topicid is not set; topicid or topicslugs required)
+     * @param int page: the page number you want to display (default 1)
+     * @param int per_page: the number of results you want per page (default 15)
+     * @param String order: desc for descending or asc for ascending (default asc)
+     * @return array posts: all the group forum posts found
+     */
+    public function groupforum_get_topic_posts() {
+        $this->init('forums');
+
+        $oReturn = new stdClass();
+
+        $mTopicExists = $this->groupforum_check_topic_existence();
+        if ($mTopicExists === false)
+            return $this->error('base', 0);
+        else if (is_int($mTopicExists) && $mTopicExists !== true)
+            return $this->error('forums', $mTopicExists);
+
+        $aConfig = array();
+        $aConfig['topic_id'] = $this->topicid;
+        $aConfig['page'] = $this->page;
+        $aConfig['per_page'] = $this->per_page;
+        $aConfig['order'] = $this->order;
+        $aPosts = bp_forums_get_topic_posts($aConfig);
+
+        foreach ($aPosts as $oPost) {
+            $oReturn->posts[(int) $oPost->post_id]->topicid = (int) $oPost->topic_id;
+            $oUser = get_user_by('id', (int) $oPost->poster_id);
+            $oReturn->posts[(int) $oPost->post_id]->poster[(int) $oPost->poster_id]->username = $oUser->data->user_login;
+            $oReturn->posts[(int) $oPost->post_id]->poster[(int) $oPost->poster_id]->mail = $oUser->data->user_email;
+            $oReturn->posts[(int) $oPost->post_id]->poster[(int) $oPost->poster_id]->display_name = $oUser->data->display_name;
+            $oReturn->posts[(int) $oPost->post_id]->post_text = $oPost->post_text;
+            $oReturn->posts[(int) $oPost->post_id]->post_time = $oPost->post_time;
+            $oReturn->posts[(int) $oPost->post_id]->post_position = (int) $oPost->post_position;
+        }
+        $oReturn->count = count($aPosts);
+
+        return $oReturn;
+    }
+
+    /**
+     * Returns an array containing info about the sitewide forum
+     * @param int forumid: the forumid you are searching for (if not set, forumslug is searched; forumid or forumslug required)
+     * @param String forumslug: the slug to search for (just used if forumid is not set; forumid or forumslug required)
+     * @return array forums: sitewide forum with some infos
+     */
+    public function sitewideforum_get_forum() {
+        $this->init('forums');
+
+        $oReturn = new stdClass();
+
+        $mForumExists = $this->sitewideforum_check_forum_existence();
+
+        if ($mForumExists !== true)
+            return $this->error('forums', $mForumExists);
+        foreach ($this->forumid as $iId) {
+            $oForum = bbp_get_forum((int) $iId);
+            $oReturn->forums[$iId]->title = $oForum->post_title;
+            $oReturn->forums[$iId]->name = $oForum->post_name;
+            $oUser = get_user_by('id', $oForum->post_author);
+            $oReturn->forums[$iId]->author[$oForum->post_author]->username = $oUser->data->user_login;
+            $oReturn->forums[$iId]->author[$oForum->post_author]->mail = $oUser->data->user_email;
+            $oReturn->forums[$iId]->author[$oForum->post_author]->display_name = $oUser->data->display_name;
+            $oReturn->forums[$iId]->date = $oForum->post_date;
+            $oReturn->forums[$iId]->last_change = $oForum->post_modified;
+            $oReturn->forums[$iId]->status = $oForum->post_status;
+            $oReturn->forums[$iId]->name = $oForum->post_name;
+            $iTopicCount = bbp_get_forum_topic_count((int) $this->forumid);
+            $oReturn->forums[$iId]->topics_count = is_null($iTopicCount) ? 0 : (int) $iTopicCount;
+            $iPostCount = bbp_get_forum_post_count((int) $this->forumid);
+            $oReturn->forums[$iId]->post_count = is_null($iPostCount) ? 0 : (int) $iPostCount;
+        }
+
+        return $oReturn;
+    }
+
+    /**
+     * Returns an array containing all sitewide forums
+     * @params int parentid: all children of the given id (default 0 = all)
+     * @return array forums: all sitewide forums
+     */
+    public function sitewideforum_get_all_forums() {
+        $this->init('forums');
+
+        $oReturn = new stdClass();
+        global $wpdb;
+        $sParentQuery = $this->parentid === false ? "" : " AND post_parent=" . (int) $this->parentid;
+        $aForums = $wpdb->get_results($wpdb->prepare(
+                        "SELECT ID, post_parent, post_author, post_title, post_date, post_modified
+                 FROM   $wpdb->posts
+                 WHERE  post_type='forum'" . $sParentQuery
+                ));
+
+        if (empty($aForums))
+            return $this->error('forums', 9);
+
+        foreach ($aForums as $aForum) {
+            $iId = (int) $aForum->ID;
+            $oUser = get_user_by('id', (int) $aForum->post_author);
+            $oReturn->forums[$iId]->author[(int) $aForum->post_author]->username = $oUser->data->user_login;
+            $oReturn->forums[$iId]->author[(int) $aForum->post_author]->mail = $oUser->data->user_email;
+            $oReturn->forums[$iId]->author[(int) $aForum->post_author]->display_name = $oUser->data->display_name;
+            $oReturn->forums[$iId]->date = $aForum->post_date;
+            $oReturn->forums[$iId]->last_changes = $aForum->post_modified;
+            $oReturn->forums[$iId]->title = $aForum->post_title;
+            $oReturn->forums[$iId]->parent = (int) $aForum->post_parent;
+        }
+        $oReturn->count = count($aForums);
+        return $oReturn;
+    }
+
+    /**
+     * Returns an array containing all topics of a sitewide forum
+     * @param int forumid: the forumid you are searching for (if not set, forumslug is searched; forumid or forumslug required)
+     * @param String forumslug: the slug to search for (just used if forumid is not set; forumid or forumslug required)
+     * @param boolean display_content: set this to true if you want the content to be displayed too (default false)
+     * @return array forums->topics: array of sitewide forums with the topics in it
      */
     public function sitewideforum_get_forum_topics() {
-        /* Possible parameters:
-         * int forumid: the forumid you are searching for (if not set, forumslug is searched; forumid or forumslug required)
-         * String forumslug: the slug to search for (just used if forumid is not set; forumid or forumslug required)
-         * boolean display_content: set this to true if you want the content to be displayed too (default false)
-         */
         $this->init('forums');
 
         $oReturn = new stdClass();
@@ -692,115 +755,29 @@ class JSON_API_BuddypressRead_Controller {
                 continue;
             }
             foreach ($aTopics as $aTopic) {
-                $oReturn->forums[(int) $iId]->topics[(int) $aTopic->ID]['author'] = (int) $aTopic->post_author;
-                $oReturn->forums[(int) $iId]->topics[(int) $aTopic->ID]['date'] = $aTopic->post_date;
+                $oUser = get_user_by('id', (int) $aTopic->post_author);
+                $oReturn->forums[(int) $iId]->topics[(int) $aTopic->ID]->author[(int) $aTopic->post_author]->username = $oUser->data->user_login;
+                $oReturn->forums[(int) $iId]->topics[(int) $aTopic->ID]->author[(int) $aTopic->post_author]->mail = $oUser->data->user_email;
+                $oReturn->forums[(int) $iId]->topics[(int) $aTopic->ID]->author[(int) $aTopic->post_author]->display_name = $oUser->data->display_name;
+                $oReturn->forums[(int) $iId]->topics[(int) $aTopic->ID]->date = $aTopic->post_date;
                 if ($this->display_content !== false)
-                    $oReturn->forums[(int) $iId]->topics[(int) $aTopic->ID]['content'] = $aTopic->post_content;
-                $oReturn->forums[(int) $iId]->topics[(int) $aTopic->ID]['last_changes'] = $aTopic->post_modified;
-                $oReturn->forums[(int) $iId]->topics[(int) $aTopic->ID]['title'] = $aTopic->post_title;
-                $oReturn->forums[(int) $iId]->topics[(int) $aTopic->ID]['parent'] = (int) $aTopic->post_parent;
+                    $oReturn->forums[(int) $iId]->topics[(int) $aTopic->ID]->content = $aTopic->post_content;
+                $oReturn->forums[(int) $iId]->topics[(int) $aTopic->ID]->last_changes = $aTopic->post_modified;
+                $oReturn->forums[(int) $iId]->topics[(int) $aTopic->ID]->title = $aTopic->post_title;
             }
-            $oReturn->forums[[(int) $iId]]->count = count($aTopics);
+            $oReturn->forums[(int) $iId]->count = count($aTopics);
         }
         return $oReturn;
     }
 
     /**
-     * Returns an object containing the topic with it's details
-     * @return Object topic
-     */
-    public function groupforum_get_topic_details() {
-        /* Possible parameters:
-         * int topicid: the topicid you are searching for (if not set, topicslug is searched; topicid or topicslug required)
-         * String topicslug: the slug to search for (just used if topicid is not set; topicid or topicslugs required)
-         */
-        $this->init('forums');
-
-        $oReturn = new stdClass();
-
-        $mTopicExists = $this->groupforum_check_topic_existence();
-
-        if ($mTopicExists === false)
-            return $this->error('base', 0);
-        else if (is_int($mTopicExists) && $mTopicExists !== true)
-            return $this->error('forums', $mTopicExists);
-
-        $oTopic = bp_forums_get_topic_details($this->topicid);
-
-        $oReturn->topic->id = (int) $oTopic->topic_id;
-        $oReturn->topic->title = $oTopic->topic_title;
-        $oReturn->topic->slug = $oTopic->topic_slug;
-        $oReturn->topic->poster[]->id = (int) $oTopic->topic_poster;
-        $oReturn->topic->poster[]->name = $oTopic->topic_poster_name;
-        $oReturn->topic->last_poster[]->id = (int) $oTopic->topic_last_poster;
-        $oReturn->topic->last_poster[]->name = $oTopic->topic_last_poster_name;
-        $oReturn->topic->start_time = $oTopic->topic_start_time;
-        $oReturn->topic->forum_id = (int) $oTopic->forum_id;
-        $oReturn->topic->topic_status = $oTopic->topic_status;
-        $oReturn->topic->is_open = (int) $oTopic->topic_open === 1 ? true : false;
-        $oReturn->topic->is_sticky = (int) $oTopic->topic_sticky === 1 ? true : false;
-        $oReturn->topic->count_posts = (int) $oTopic->topic_posts;
-
-        return $oReturn;
-    }
-
-    /**
-     * Returns an arary containing the posts
-     * @return Array posts
-     */
-    public function groupforum_get_topic_posts() {
-        /* Possible parameters:
-         * int topicid: the topicid you are searching for (if not set, topicslug is searched; topicid or topicslug required)
-         * String topicslug: the slug to search for (just used if topicid is not set; topicid or topicslugs required)
-         * int page: the page number you want to display (default 1)
-         * int per_page: the number of results you want per page (default 15)
-         * String order: desc for descending or asc for ascending (default asc)
-         */
-        $this->init('forums');
-
-        $oReturn = new stdClass();
-
-        $mTopicExists = $this->groupforum_check_topic_existence();
-        if ($mTopicExists === false)
-            return $this->error('base', 0);
-        else if (is_int($mTopicExists) && $mTopicExists !== true)
-            return $this->error('forums', $mTopicExists);
-
-        $aConfig = array();
-        $aConfig['topic_id'] = $this->topicid;
-        $aConfig['page'] = $this->page;
-        $aConfig['per_page'] = $this->per_page;
-        $aConfig['order'] = $this->order;
-        $aPosts = bp_forums_get_topic_posts($aConfig);
-
-        $oReturn->post = array();
-
-        foreach ($aPosts as $key => $oPost) {
-            $oReturn->post[$key]->id = new stdClass();
-            $oReturn->post[$key]->id = (int) $oPost->post_id;
-            $oReturn->post[$key]->topicid = (int) $oPost->topic_id;
-            $oReturn->post[$key]->poster[]->id = (int) $oPost->poster_id;
-            $oReturn->post[$key]->poster[]->username = $oPost->poster_login;
-            $oReturn->post[$key]->poster[]->name = $oPost->poster_name;
-            $oReturn->post[$key]->post_text = $oPost->post_text;
-            $oReturn->post[$key]->post_time = $oPost->post_time;
-            $oReturn->post[$key]->post_position = (int) $oPost->post_position;
-        }
-        $oReturn->count = count($aPosts);
-
-        return $oReturn;
-    }
-
-    /**
-     * Returns an array containing all replies to a topic
-     * @return Array replies
+     * Returns an array containing all replies to a topic from a sitewide forum
+     * @param int topicid: the topicid you are searching for (if not set, topicslug is searched; topicid or topicsslug required)
+     * @param String topicslug: the slug to search for (just used if topicid is not set; topicid or topicslug required)
+     * @param boolean display_content: set this to true if you want the content to be displayed too (default false)
+     * @return array topics->replies: an array containing the replies
      */
     public function sitewideforum_get_topic_replies() {
-        /* Possible parameters:
-         * int topicid: the topicid you are searching for (if not set, topicslug is searched; topicid or topicsslug required)
-         * String topicslug: the slug to search for (just used if topicid is not set; topicid or topicslug required)
-         * boolean display_content: set this to true if you want the content to be displayed too (default false)
-         */
         $this->init('forums');
 
         $oReturn = new stdClass();
@@ -824,13 +801,15 @@ class JSON_API_BuddypressRead_Controller {
                 continue;
             }
             foreach ($aReplies as $oReply) {
-                $oReturn->topics[$iId]->replies[(int) $oReply->ID]['author'] = (int) $oReply->post_author;
-                $oReturn->topics[$iId]->replies[(int) $oReply->ID]['date'] = $oReply->post_date;
+                $oUser = get_user_by('id', (int) $oReply->post_author);
+                $oReturn->topics[$iId]->replies[(int) $oReply->ID]->author[(int) $oReply->post_author]->username = $oUser->data->user_login;
+                $oReturn->topics[$iId]->replies[(int) $oReply->ID]->author[(int) $oReply->post_author]->mail = $oUser->data->user_email;
+                $oReturn->topics[$iId]->replies[(int) $oReply->ID]->author[(int) $oReply->post_author]->display_name = $oUser->data->display_name;
+                $oReturn->topics[$iId]->replies[(int) $oReply->ID]->date = $oReply->post_date;
                 if ($this->display_content !== false)
-                    $oReturn->topics[$iId]->replies[(int) $oReply->ID]['content'] = $oReply->post_content;
-                $oReturn->topics[$iId]->replies[(int) $oReply->ID]['last_changes'] = $oReply->post_modified;
-                $oReturn->topics[$iId]->replies[(int) $oReply->ID]['title'] = $oReply->post_title;
-                $oReturn->topics[$iId]->replies[(int) $oReply->ID]['parent'] = (int) $oReply->post_parent;
+                    $oReturn->topics[$iId]->replies[(int) $oReply->ID]->content = $oReply->post_content;
+                $oReturn->topics[$iId]->replies[(int) $oReply->ID]->last_changes = $oReply->post_modified;
+                $oReturn->topics[$iId]->replies[(int) $oReply->ID]->title = $oReply->post_title;
             }
             $oReturn->topics[$iId]->count = count($aReplies);
         }
@@ -838,10 +817,12 @@ class JSON_API_BuddypressRead_Controller {
         return $oReturn;
     }
 
-    public function get_settings() {
-        /* Possible Parameters:
-         * none
-         */
+    /**
+     * Returns the settings for the current user
+     * @params none no parameters
+     * @return object settings: an object full of the settings
+     */
+    public function settings_get_settings() {
         $this->init('settings');
         $oReturn = new stdClass();
 
@@ -867,28 +848,21 @@ class JSON_API_BuddypressRead_Controller {
         $sNewMessages = bp_get_user_meta($oUser->data->ID, 'notification_messages_new_message', true);
         $sNewNotices = bp_get_user_meta($oUser->data->ID, 'notification_messages_new_notice', true);
 
-        $oReturn->settings['new_mention'] = $sNewMention == 'yes' ? true : false;
-        $oReturn->settings['new_reply'] = $sNewReply == 'yes' ? true : false;
-        $oReturn->settings['send_requests'] = $sSendRequests == 'yes' ? true : false;
-        $oReturn->settings['accept_requests'] = $sAcceptRequests == 'yes' ? true : false;
-        $oReturn->settings['group_invite'] = $sGroupInvite == 'yes' ? true : false;
-        $oReturn->settings['group_update'] = $sGroupUpdate == 'yes' ? true : false;
-        $oReturn->settings['group_promo'] = $sGroupPromo == 'yes' ? true : false;
-        $oReturn->settings['group_request'] = $sGroupRequest == 'yes' ? true : false;
-        $oReturn->settings['new_message'] = $sNewMessages == 'yes' ? true : false;
-        $oReturn->settings['new_notice'] = $sNewNotices == 'yes' ? true : false;
+        $oReturn->settings->new_mention = $sNewMention == 'yes' ? true : false;
+        $oReturn->settings->new_reply = $sNewReply == 'yes' ? true : false;
+        $oReturn->settings->send_requests = $sSendRequests == 'yes' ? true : false;
+        $oReturn->settings->accept_requests = $sAcceptRequests == 'yes' ? true : false;
+        $oReturn->settings->group_invite = $sGroupInvite == 'yes' ? true : false;
+        $oReturn->settings->group_update = $sGroupUpdate == 'yes' ? true : false;
+        $oReturn->settings->group_promo = $sGroupPromo == 'yes' ? true : false;
+        $oReturn->settings->group_request = $sGroupRequest == 'yes' ? true : false;
+        $oReturn->settings->new_message = $sNewMessages == 'yes' ? true : false;
+        $oReturn->settings->new_notice = $sNewNotices == 'yes' ? true : false;
 
         return $oReturn;
     }
 
-    /**
-     * Method to handle calls for the library
-     * @param String $sName name of the static method to call
-     * @param Array $aArguments arguments for the method
-     * @return return value of static library function, otherwise null
-     */
     public function __call($sName, $aArguments) {
-        //tbd check if module active
         if (class_exists("JSON_API_FOR_BUDDYPRESS_FUNCTION") &&
                 method_exists(JSON_API_FOR_BUDDYPRESS_FUNCTION, $sName) &&
                 is_callable("JSON_API_FOR_BUDDYPRESS_FUNCTION::" . $sName)) {
@@ -905,11 +879,6 @@ class JSON_API_BuddypressRead_Controller {
             return NULL;
     }
 
-    /**
-     * Method to handle calls for parameters
-     * @param String $sName Name of the variable
-     * @return mixed value of the variable, otherwise null
-     */
     public function __get($sName) {
         return isset(JSON_API_FOR_BUDDYPRESS_FUNCTION::$sVars[$sName]) ? JSON_API_FOR_BUDDYPRESS_FUNCTION::$sVars[$sName] : NULL;
     }
