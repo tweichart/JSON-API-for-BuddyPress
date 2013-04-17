@@ -18,7 +18,7 @@ if (!is_plugin_active('buddypress/bp-loader.php')) {
     return;
 }
 
-if (!is_plugin_active('json-api-for-buddypress/json-api-for-buddypress.php')) {
+if (!is_plugin_active('json-api/json-api.php')) {
     add_action('admin_notices', 'draw_notice_json_api');
     return;
 }
