@@ -35,7 +35,7 @@ function draw_notice_buddypress() {
 
 function draw_notice_json_api() {
     echo '<div id="message" class="error fade"><p style="line-height: 150%">';
-    _e('<strong>JSON API for Buddypress</strong></a> requires the BuddyPress plugin to be activated. Please <a href="http://buddypress.org">install / activate BuddyPress</a> first, or <a href="plugins.php">deactivate JSON API for Buddypress</a>.', 'json-api-for-buddypress');
+    _e('<strong>JSON API for Buddypress</strong></a> requires to be activated. Please <a href="plugins.php">activate JSON API for Buddypress</a>.', 'json-api-for-buddypress');
     echo '</p></div>';
 }
 
