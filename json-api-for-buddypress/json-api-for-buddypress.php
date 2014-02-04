@@ -4,7 +4,7 @@
   Plugin Name: JSON API for Buddypress
   Plugin URI: http://wordpress.org/download/json-api-for-buddypress.zip
   Description: Extends the JSON API to be used with Buddypress
-  Version: 1.0
+  Version: 1.0.1
   Author: Tobias Weichart
   Author URI: https://github.com/tweichart/JSON-API-for-BuddyPress
   License: GPL2
