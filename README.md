@@ -11,6 +11,14 @@ For further information refer to the GitHub Project Page at http://tweichart.git
 
 ==Release Notes==
 
+===1.0.2===
+* added possibility to get avatars and user meta data from profile_get_profile
+
+===1.0.1===
+* added support for de_DE
+* added support for es_ES (all credits to the spanish translation to Andrew Kurtis from webhostinghub.com)
+* changed folder structure
+
 ===1.0===
 * code review
 * added documentation

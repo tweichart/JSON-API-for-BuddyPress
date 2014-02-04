@@ -1,0 +1,129 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: JSON API for BuddyPress\n"
+"POT-Creation-Date: 2013-11-29 15:20+0100\n"
+"PO-Revision-Date: 2013-12-16 18:19+0100\n"
+"Last-Translator: Andrew Kurtis <andrewk@webhostinghub.com>\n"
+"Language-Team: Andrew Kurtis <andrewk@webhostinghub.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.7\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"Language: Spanish\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPath-1: controllers\n"
+
+#: json-api-for-buddypress.php:32
+msgid ""
+"<strong>JSON API for Buddypress</strong> requires the BuddyPress plugin to "
+"be activated. Please <a href=\"http://buddypress.org\">install / activate "
+"BuddyPress</a> first, or <a href=\"plugins.php\">deactivate JSON API for "
+"Buddypress</a>."
+msgstr ""
+"<strong>JSON API para Buddypress</strong> requiere que el plugin Buddypress "
+"esté activado. Por favor  <a href=\"http://buddypress.org\">instale/ active "
+"BuddyPress</a> primero, o <a href=\"plugins.php\">desactive JSON API para "
+"Buddypress</a>."
+
+#: json-api-for-buddypress.php:38
+msgid ""
+"<strong>JSON API for Buddypress</strong> requires the JSON API plugin to be "
+"activated. Please <a href=\"http://wordpress.org/plugins/json-api/"
+"\">install / activate JSON API</a> first, or <a href=\"plugins.php"
+"\">deactivate JSON API for Buddypress</a>."
+msgstr ""
+"<strong>JSON API para Buddypress</strong> requiere que el plugin Buddypress "
+"esté activado. Por favor  <a href=\"http://wordpress.org/plugins/json-api/"
+"\">instale/active JSON API</a> primero, o <a href=\"plugins.php\">desactive "
+"JSON API para  Buddypress</a>."
+
+#: library/functions.class.php:205
+msgid "No Activities found."
+msgstr "No se encontraron Actividades."
+
+#: library/functions.class.php:210
+msgid "No Profile found."
+msgstr "No se encontraron Perfiles."
+
+#: library/functions.class.php:213 library/functions.class.php:226
+#: library/functions.class.php:245 library/functions.class.php:295
+msgid "Username not found."
+msgstr "No se encontró el usuario."
+
+#: library/functions.class.php:218
+msgid "No messages found."
+msgstr "No se encontraron mensajes."
+
+#: library/functions.class.php:221
+msgid "No notifications found."
+msgstr "No se encontraron notificaciones."
+
+#: library/functions.class.php:229
+msgid "No friends found."
+msgstr "No se encontraron amigos."
+
+#: library/functions.class.php:232
+msgid "No friendship requests found."
+msgstr "No se encontraron pedidos de amistad."
+
+#: library/functions.class.php:235
+msgid "Friendname not found."
+msgstr "No se encontró el nombre de amigo."
+
+#: library/functions.class.php:242
+msgid "No groups found."
+msgstr "No se encontraron grupos."
+
+#: library/functions.class.php:248 library/functions.class.php:267
+msgid "Neither groupid nor groupslug are set."
+msgstr "Ni el groupid ni el groupslug se han establecido."
+
+#: library/functions.class.php:251 library/functions.class.php:270
+msgid "Group not found."
+msgstr "No se encontró el grupo."
+
+#: library/functions.class.php:254
+msgid "No Members in Group"
+msgstr "No hay miembros en el Grupo"
+
+#: library/functions.class.php:261
+msgid "Forums are disabled for this group."
+msgstr "Los foros están deshabilitados para este grupo."
+
+#: library/functions.class.php:264
+msgid "No forum assigned to this group."
+msgstr "No se han asignado foros a este grupo."
+
+#: library/functions.class.php:273
+msgid "Neither forumid nor forumslug are set."
+msgstr "Ni el forumid ni el forumslug se han establecido."
+
+#: library/functions.class.php:276
+msgid "Forum not found."
+msgstr "No se encontró el foro."
+
+#: library/functions.class.php:279
+msgid "Neither topicid nor topicslug are set."
+msgstr "Ni el topicid ni el topicslug se han establecido."
+
+#: library/functions.class.php:282
+msgid "No topics in this forum."
+msgstr "No hay tópicos en este foro."
+
+#: library/functions.class.php:285
+msgid "No topics found."
+msgstr "No se encontraron tópicos."
+
+#: library/functions.class.php:288
+msgid "No forums found."
+msgstr "No se encontraron foros."
+
+#: library/functions.class.php:302
+msgid "You are not allowed to view this information."
+msgstr "Usted no tiene permitido ver esta información."
+
+#: library/functions.class.php:307
+msgid "An undefined error occured."
+msgstr "Un error indefinido ocurrió."

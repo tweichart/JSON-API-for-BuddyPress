@@ -1,0 +1,121 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: JSON API for BuddyPress\n"
+"POT-Creation-Date: 2013-11-29 15:20+0100\n"
+"PO-Revision-Date: 2013-11-29 15:20+0100\n"
+"Last-Translator: Tobias Weichart <tobias.weichart@gmail.com>\n"
+"Language-Team: tweichart <tobias.weichart@gmail.com>\n"
+"Language: English\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.7\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"\\json-api-for-buddypress\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPath-1: controllers\n"
+
+#: json-api-for-buddypress.php:32
+msgid ""
+"<strong>JSON API for Buddypress</strong> requires the BuddyPress plugin to "
+"be activated. Please <a href=\"http://buddypress.org\">install / activate "
+"BuddyPress</a> first, or <a href=\"plugins.php\">deactivate JSON API for "
+"Buddypress</a>."
+msgstr ""
+
+#: json-api-for-buddypress.php:38
+msgid ""
+"<strong>JSON API for Buddypress</strong> requires the JSON API plugin to be "
+"activated. Please <a href=\"http://wordpress.org/plugins/json-api/"
+"\">install / activate JSON API</a> first, or <a href=\"plugins.php"
+"\">deactivate JSON API for Buddypress</a>."
+msgstr ""
+
+#: library/functions.class.php:205
+msgid "No Activities found."
+msgstr ""
+
+#: library/functions.class.php:210
+msgid "No Profile found."
+msgstr ""
+
+#: library/functions.class.php:213 library/functions.class.php:226
+#: library/functions.class.php:245 library/functions.class.php:295
+msgid "Username not found."
+msgstr ""
+
+#: library/functions.class.php:218
+msgid "No messages found."
+msgstr ""
+
+#: library/functions.class.php:221
+msgid "No notifications found."
+msgstr ""
+
+#: library/functions.class.php:229
+msgid "No friends found."
+msgstr ""
+
+#: library/functions.class.php:232
+msgid "No friendship requests found."
+msgstr ""
+
+#: library/functions.class.php:235
+msgid "Friendname not found."
+msgstr ""
+
+#: library/functions.class.php:242
+msgid "No groups found."
+msgstr ""
+
+#: library/functions.class.php:248 library/functions.class.php:267
+msgid "Neither groupid nor groupslug are set."
+msgstr ""
+
+#: library/functions.class.php:251 library/functions.class.php:270
+msgid "Group not found."
+msgstr ""
+
+#: library/functions.class.php:254
+msgid "No Members in Group"
+msgstr ""
+
+#: library/functions.class.php:261
+msgid "Forums are disabled for this group."
+msgstr ""
+
+#: library/functions.class.php:264
+msgid "No forum assigned to this group."
+msgstr ""
+
+#: library/functions.class.php:273
+msgid "Neither forumid nor forumslug are set."
+msgstr ""
+
+#: library/functions.class.php:276
+msgid "Forum not found."
+msgstr ""
+
+#: library/functions.class.php:279
+msgid "Neither topicid nor topicslug are set."
+msgstr ""
+
+#: library/functions.class.php:282
+msgid "No topics in this forum."
+msgstr ""
+
+#: library/functions.class.php:285
+msgid "No topics found."
+msgstr ""
+
+#: library/functions.class.php:288
+msgid "No forums found."
+msgstr ""
+
+#: library/functions.class.php:302
+msgid "You are not allowed to view this information."
+msgstr ""
+
+#: library/functions.class.php:307
+msgid "An undefined error occured."
+msgstr ""

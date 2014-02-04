@@ -202,109 +202,109 @@ class JSON_API_FOR_BUDDYPRESS_FUNCTION extends JSON_API_BuddypressRead_Controlle
         $oReturn->status = "error";
         switch ($sModule) {
             case "activity":
-                $oReturn->msg = __('No Activities found.');
+                $oReturn->msg = __('No Activities found.', 'json-api-for-buddypress');
                 break;
             case "xprofile":
                 switch ($iCode) {
                     case 0:
-                        $oReturn->msg = __('No Profile found.');
+                        $oReturn->msg = __('No Profile found.', 'json-api-for-buddypress');
                         break;
                     case 1:
-                        $oReturn->msg = __('Username not found.');
+                        $oReturn->msg = __('Username not found.', 'json-api-for-buddypress');
                         break;
                 }
                 break;
             case "messages":
-                $oReturn->msg = __('No messages found.');
+                $oReturn->msg = __('No messages found.', 'json-api-for-buddypress');
                 break;
             case "notifications":
-                $oReturn->msg = __('No notifications found.');
+                $oReturn->msg = __('No notifications found.', 'json-api-for-buddypress');
                 break;
             case "friends":
                 switch ($iCode) {
                     case 0:
-                        $oReturn->msg = __('Username not found.');
+                        $oReturn->msg = __('Username not found.', 'json-api-for-buddypress');
                         break;
                     case 1:
-                        $oReturn->msg = __('No friends found.');
+                        $oReturn->msg = __('No friends found.', 'json-api-for-buddypress');
                         break;
                     case 2:
-                        $oReturn->msg = __('No friendship requests found.');
+                        $oReturn->msg = __('No friendship requests found.', 'json-api-for-buddypress');
                         break;
                     case 3:
-                        $oReturn->msg = __('Friendname not found.');
+                        $oReturn->msg = __('Friendname not found.', 'json-api-for-buddypress');
                         break;
                 }
                 break;
             case "groups":
                 switch ($iCode) {
                     case 0:
-                        $oReturn->msg = __('No groups found.');
+                        $oReturn->msg = __('No groups found.', 'json-api-for-buddypress');
                         break;
                     case 1:
-                        $oReturn->msg = __('Username not found.');
+                        $oReturn->msg = __('Username not found.', 'json-api-for-buddypress');
                         break;
                     case 2:
-                        $oReturn->msg = __('Neither groupid nor groupslug are set.');
+                        $oReturn->msg = __('Neither groupid nor groupslug are set.', 'json-api-for-buddypress');
                         break;
                     case 3:
-                        $oReturn->msg = __('Group not found.');
+                        $oReturn->msg = __('Group not found.', 'json-api-for-buddypress');
                         break;
                     case 4:
-                        $oReturn->msg = __('No Members in Group');
+                        $oReturn->msg = __('No Members in Group', 'json-api-for-buddypress');
                         break;
                 }
                 break;
             case "forums":
                 switch ($iCode) {
                     case 0:
-                        $oReturn->msg = __('Forums are disabled for this group.');
+                        $oReturn->msg = __('Forums are disabled for this group.', 'json-api-for-buddypress');
                         break;
                     case 1:
-                        $oReturn->msg = __('No forum assigned to this group.');
+                        $oReturn->msg = __('No forum assigned to this group.', 'json-api-for-buddypress');
                         break;
                     case 2:
-                        $oReturn->msg = __('Neither groupid nor groupslug are set.');
+                        $oReturn->msg = __('Neither groupid nor groupslug are set.', 'json-api-for-buddypress');
                         break;
                     case 3:
-                        $oReturn->msg = __('Group not found.');
+                        $oReturn->msg = __('Group not found.', 'json-api-for-buddypress');
                         break;
                     case 4:
-                        $oReturn->msg = __('Neither forumid nor forumslug are set.');
+                        $oReturn->msg = __('Neither forumid nor forumslug are set.', 'json-api-for-buddypress');
                         break;
                     case 5:
-                        $oReturn->msg = __('Forum not found.');
+                        $oReturn->msg = __('Forum not found.', 'json-api-for-buddypress');
                         break;
                     case 6:
-                        $oReturn->msg = __('Neither topicid nor topicslug are set.');
+                        $oReturn->msg = __('Neither topicid nor topicslug are set.', 'json-api-for-buddypress');
                         break;
                     case 7:
-                        $oReturn->msg = __('No topics in this forum.');
+                        $oReturn->msg = __('No topics in this forum.', 'json-api-for-buddypress');
                         break;
                     case 8:
-                        $oReturn->msg = __('No topics found.');
+                        $oReturn->msg = __('No topics found.', 'json-api-for-buddypress');
                         break;
                     case 9:
-                        $oReturn->msg = __('No forums found.');
+                        $oReturn->msg = __('No forums found.', 'json-api-for-buddypress');
                         break;
                 }
                 break;
             case "settings":
                 switch ($iCode) {
                     case 0:
-                        $oReturn->msg = __('Username not found.');
+                        $oReturn->msg = __('Username not found.', 'json-api-for-buddypress');
                         break;
                 }
                 break;
             case "base":
                 switch ($iCode) {
                     case 0:
-                        $oReturn->msg = __('You are not allowed to view this information.');
+                        $oReturn->msg = __('You are not allowed to view this information.', 'json-api-for-buddypress');
                         break;
                 }
                 break;
             default:
-                $oReturn->msg = __('An undefined error occured.');
+                $oReturn->msg = __('An undefined error occured.', 'json-api-for-buddypress');
         }
         return $oReturn;
     }
